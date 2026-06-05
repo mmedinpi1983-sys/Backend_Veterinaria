@@ -1,0 +1,54 @@
+package com.utp.sistemaclinicaveterinaria.modulos.Mascota;
+import java.time.*;
+
+import java.util.List;
+public interface MascotaDTO {
+    record Request(
+                 String nombre,
+                 Integer idEspecie,
+                 Integer idRaza,
+                 Integer idAsociado,
+                 LocalDate fechaNacimiento,
+                 String sexo,
+                 String tamanio,
+                 String notas,
+                 Boolean estado
+    ) {}
+    record Response(
+                 Integer idMascota,
+                 String nombre,
+                 Integer idEspecie,
+                 Integer idRaza,
+                 Integer idAsociado,
+                 LocalDate fechaNacimiento,
+                 String sexo,
+                 String tamanio,
+                 String notas,
+                 Boolean estado,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idMascota,
+                 String nombre,
+                 String sexo,
+                 String tamanio,
+                 LocalDateTime fechaCreacion,
+                 Boolean estado
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+    record SearchItem(
+                 Integer idMascota,
+                 String nombre,
+                 String especie,
+                 String raza,
+                 Integer idDueno,
+                 String nombreDueno,
+                 String tamanio,
+                 String sexo
+    ) {}
+}

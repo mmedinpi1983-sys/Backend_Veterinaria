@@ -1,0 +1,43 @@
+package com.utp.sistemaclinicaveterinaria.modulos.Dueno;
+import java.time.*;
+import java.util.List;
+public interface DuenoDTO {
+    record Request(
+                 Integer idDocumentoIdentidad,
+                 Integer idAsociado,
+                 String nombre,
+                 String apellidoPaterno,
+                 String apellidoMaterno,
+                 String nroDocumento,
+                 String nroTelefono,
+                 String correoElectronico,
+                 Boolean estado
+    ) {}
+    record Response(
+                 Integer idDueno,
+                 Integer idDocumentoIdentidad,
+                 Integer idAsociado,
+                 String nombre,
+                 String apellidoPaterno,
+                 String apellidoMaterno,
+                 String nroDocumento,
+                 String nroTelefono,
+                 String correoElectronico,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Boolean estado,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idDueno,
+                 String nombre,
+                 String apellidoPaterno,
+                 String apellidoMaterno,
+                 LocalDateTime fechaCreacion,
+                 Boolean estado
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+}
