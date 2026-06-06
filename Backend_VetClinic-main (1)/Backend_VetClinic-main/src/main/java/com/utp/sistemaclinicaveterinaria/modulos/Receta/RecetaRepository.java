@@ -1,0 +1,11 @@
+package com.utp.sistemaclinicaveterinaria.modulos.Receta;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.List;
+@Repository
+public interface RecetaRepository extends JpaRepository<Receta, Integer> {
+    List<Receta> findByFechaEliminacionIsNull();
+    Optional<Receta> findByIdRecetaAndFechaEliminacionIsNull(Integer idReceta);
+    Optional<Receta> findByIdConsultaAndFechaEliminacionIsNull(Integer idConsulta);
+}

@@ -1,0 +1,57 @@
+package com.utp.sistemaclinicaveterinaria.modulos.Anamnesis;
+import java.time.*;
+import java.math.BigDecimal;
+import java.util.List;
+public interface AnamnesisDTO {
+    record Request(
+                 Integer idConsulta,
+                 String antecedentes,
+                 Integer alergias,
+                 Integer cirugiasAnteriores,
+                 String medicamentosActuales,
+                 String alimentacion,
+                 String comportamiento,
+                 String inicioSintomas,
+                 String evolucionSintomas,
+                 String observaciones,
+                 String detalleAlergias,
+                 String detalleCirugias,
+                 String historialVacunacion,
+                 String estiloVida,
+                 Integer historialReproductivo,
+                 String reproduccionDetalle
+    ) {}
+    record Response(
+                 Integer idAnamnesis,
+                 Integer idConsulta,
+                 String antecedentes,
+                 Integer alergias,
+                 Integer cirugiasAnteriores,
+                 String medicamentosActuales,
+                 String alimentacion,
+                 String comportamiento,
+                 String inicioSintomas,
+                 String evolucionSintomas,
+                 String observaciones,
+                 String detalleAlergias,
+                 String detalleCirugias,
+                 String historialVacunacion,
+                 String estiloVida,
+                 Integer historialReproductivo,
+                 String reproduccionDetalle,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idAnamnesis,
+                 String antecedentes,
+                 String medicamentosActuales,
+                 String alimentacion,
+                 LocalDateTime fechaCreacion
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+}
