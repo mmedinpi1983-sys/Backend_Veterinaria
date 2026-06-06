@@ -1,0 +1,52 @@
+package com.utp.sistemaclinicaveterinaria.modulos.EmpleadoAsociado;
+import java.time.*;
+import java.math.BigDecimal;
+import java.util.List;
+public interface EmpleadoAsociadoDTO {
+    record Request(
+                 Integer idAsociado,
+                 String correo,
+                 String contrasena,
+                 String nombreEmpleado,
+                 String apellidoPaterno,
+                 String apellidoMaterno,
+                 String nroDocumento,
+                 LocalDateTime fechaNacimiento,
+                 Integer idDocumentoIdentidad,
+                 Integer idRolesClinica,
+                 String correoElectronico,
+                 String nroTelefono,
+                 Boolean estado
+    ) {}
+    record Response(
+                 Integer idEmpleadoAsociado,
+                 Integer idAsociado,
+                 String correo,
+                 String contrasena,
+                 String nombreEmpleado,
+                 String apellidoPaterno,
+                 String apellidoMaterno,
+                 String nroDocumento,
+                 LocalDateTime fechaNacimiento,
+                 Integer idDocumentoIdentidad,
+                 Integer idRolesClinica,
+                 String correoElectronico,
+                 String nroTelefono,
+                 Boolean estado,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idEmpleadoAsociado,
+                 String correo,
+                 String contrasena,
+                 String nombreEmpleado,
+                 LocalDateTime fechaCreacion,
+                 Boolean estado
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+}
