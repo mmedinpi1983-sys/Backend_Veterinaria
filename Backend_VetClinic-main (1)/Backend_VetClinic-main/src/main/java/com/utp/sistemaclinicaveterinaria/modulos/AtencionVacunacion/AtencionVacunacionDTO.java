@@ -1,0 +1,40 @@
+package com.utp.sistemaclinicaveterinaria.modulos.AtencionVacunacion;
+import java.time.*;
+import java.math.BigDecimal;
+import java.util.List;
+public interface AtencionVacunacionDTO {
+    record Request(
+                 Integer idAtencion,
+                 Integer idVacuna,
+                 Integer dosis,
+                 LocalDate fechaAplicacion,
+                 LocalDate fechaRefuerzo,
+                 String observaciones,
+                 Boolean estado,
+                 Integer idConsulta
+    ) {}
+    record Response(
+                 Integer idVacunacion,
+                 Integer idAtencion,
+                 Integer idVacuna,
+                 Integer dosis,
+                 LocalDate fechaAplicacion,
+                 LocalDate fechaRefuerzo,
+                 String observaciones,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Boolean estado,
+                 Integer idConsulta,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idVacunacion,
+                 String observaciones,
+                 LocalDateTime fechaCreacion,
+                 Boolean estado
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+}
