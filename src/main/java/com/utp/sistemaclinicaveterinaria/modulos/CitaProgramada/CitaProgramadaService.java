@@ -5,6 +5,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDT
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.StatsResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.Response;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.VeterinarioDisponible;
 public interface CitaProgramadaService {
     List<ListItem> listar();
     List<CitaEnriquecida> listarEnriquecido(Integer idEstado, Integer idEmpleado, String fechaInicio, String fechaFin, String busqueda);
@@ -13,4 +14,7 @@ public interface CitaProgramadaService {
     Response crear(Request request);
     Response actualizar(Integer id, Request request);
     void eliminar(Integer id);
+    List<CitaEnriquecida> listarPorMascota(Integer idMascota);
+    List<VeterinarioDisponible> listarVeterinarios();
+    List<String> horasOcupadas(Integer idProgramacion, String fecha, Integer excluirId);
 }

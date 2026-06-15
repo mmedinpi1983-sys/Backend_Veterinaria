@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Dueno;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +17,9 @@ public class DuenoServiceImpl implements DuenoService {
         return toResponse(e);
     }
     @Override public Response crear(Request request) {
+        if (repository.existsByNroDocumentoAndFechaEliminacionIsNull(request.nroDocumento())) {
+            throw new ApiException("Ya existe un dueño registrado con ese DNI", "DUPLICATE");
+        }
         Dueno e = new Dueno();
         e.setIdDocumentoIdentidad(request.idDocumentoIdentidad());
         e.setIdAsociado(request.idAsociado());
@@ -27,12 +31,15 @@ public class DuenoServiceImpl implements DuenoService {
         e.setCorreoElectronico(request.correoElectronico());
         e.setEstado(request.estado());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public Response actualizar(Integer id, Request request) {
         Dueno e = repository.findByIdDuenoAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Dueno no encontrado", "NOT_FOUND"));
+        if (repository.existsByNroDocumentoAndIdDuenoNotAndFechaEliminacionIsNull(request.nroDocumento(), id)) {
+            throw new ApiException("Ya existe otro dueño registrado con ese DNI", "DUPLICATE");
+        }
         e.setIdDocumentoIdentidad(request.idDocumentoIdentidad());
         e.setIdAsociado(request.idAsociado());
         e.setNombre(request.nombre());
@@ -43,12 +50,14 @@ public class DuenoServiceImpl implements DuenoService {
         e.setCorreoElectronico(request.correoElectronico());
         e.setEstado(request.estado());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         Dueno e = repository.findByIdDuenoAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Dueno no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     private Response toResponse(Dueno e) { return new Response(e.getIdDueno(), e.getIdDocumentoIdentidad(), e.getIdAsociado(), e.getNombre(), e.getApellidoPaterno(), e.getApellidoMaterno(), e.getNroDocumento(), e.getNroTelefono(), e.getCorreoElectronico(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getEstado(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }

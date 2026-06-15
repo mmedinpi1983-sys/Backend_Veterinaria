@@ -1,31 +1,32 @@
-package com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza;
+package com.utp.sistemaclinicaveterinaria.modulos.Turno;
 import java.time.*;
 import java.math.BigDecimal;
 import java.util.List;
-public interface EspecieRazaDTO {
+public interface TurnoDTO {
     record Request(
                  String nombre,
-                 Integer idEspecie,
+                 LocalTime horaInicio,
+                 LocalTime horaFin,
                  Boolean estado,
                  Integer idAsociado
     ) {}
     record Response(
-                 Integer idEspecieRaza,
+                 Integer idTurno,
                  String nombre,
-                 Integer idEspecie,
-                 Boolean estado,
+                 LocalTime horaInicio,
+                 LocalTime horaFin,
                  LocalDateTime fechaCreacion,
                  LocalDateTime fechaModificacion,
                  LocalDateTime fechaEliminacion,
+                 Boolean estado,
                  Integer idAsociado,
                  Integer idEmpleadoCreador,
                  Integer idEmpleadoModificador,
                  Integer idEmpleadoEliminador
     ) {}
     record ListItem(
-                 Integer idEspecieRaza,
+                 Integer idTurno,
                  String nombre,
-                 Integer idEspecie,
                  LocalDateTime fechaCreacion,
                  Boolean estado
     ) {}
