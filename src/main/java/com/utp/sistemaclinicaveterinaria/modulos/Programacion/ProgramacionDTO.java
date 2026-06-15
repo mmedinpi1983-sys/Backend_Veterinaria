@@ -1,0 +1,42 @@
+package com.utp.sistemaclinicaveterinaria.modulos.Programacion;
+import java.time.*;
+import java.math.BigDecimal;
+import java.util.List;
+public interface ProgramacionDTO {
+    record Request(
+                 LocalDate fecha,
+                 Integer idTurno,
+                 Integer idEmpleadoRegistrador,
+                 Integer idEstadoProgramacion,
+                 Integer idAsociado,
+                 Integer idCategoria,
+                 Integer idServicio,
+                 String ambiente,
+                 String descripcion
+    ) {}
+    record Response(
+                 Integer idProgramacion,
+                 LocalDate fecha,
+                 Integer idTurno,
+                 Integer idEmpleadoRegistrador,
+                 Integer idEstadoProgramacion,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Integer idAsociado,
+                 Integer idCategoria,
+                 Integer idServicio,
+                 String ambiente,
+                 String descripcion,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idProgramacion,
+                 String ambiente,
+                 String descripcion,
+                 LocalDateTime fechaCreacion
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+}

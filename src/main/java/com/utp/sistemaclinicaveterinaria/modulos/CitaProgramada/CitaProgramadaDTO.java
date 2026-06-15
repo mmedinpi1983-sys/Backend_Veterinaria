@@ -1,0 +1,71 @@
+package com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada;
+import java.time.*;
+import java.math.BigDecimal;
+import java.util.List;
+public interface CitaProgramadaDTO {
+    record Request(
+                 Integer idDueno,
+                 Integer idProgramacion,
+                 Integer idMascota,
+                 LocalDate fecha,
+                 LocalTime horaInicio,
+                 LocalTime horaFin,
+                 Integer idEstadoCita,
+                 String motivo,
+                 Integer idAsociado,
+                 Integer idCategoria,
+                 Integer idServicio,
+                 String motivoReprogramacion
+    ) {}
+    record Response(
+                 Integer idCitaProgramada,
+                 Integer idDueno,
+                 Integer idProgramacion,
+                 Integer idMascota,
+                 LocalDate fecha,
+                 LocalTime horaInicio,
+                 LocalTime horaFin,
+                 Integer idEstadoCita,
+                 String motivo,
+                 Integer idAsociado,
+                 Integer idCategoria,
+                 Integer idServicio,
+                 String motivoReprogramacion,
+                 LocalDateTime fechaCreacion,
+                 LocalDateTime fechaModificacion,
+                 LocalDateTime fechaEliminacion,
+                 Integer idEmpleadoCreador,
+                 Integer idEmpleadoModificador,
+                 Integer idEmpleadoEliminador
+    ) {}
+    record ListItem(
+                 Integer idCitaProgramada,
+                 String motivo,
+                 String motivoReprogramacion,
+                 LocalDateTime fechaCreacion
+    ) {}
+    record ListResponse(List<ListItem> items) {}
+
+    record CitaEnriquecida(
+        Integer idCitaProgramada,
+        LocalDate fecha,
+        LocalTime horaInicio,
+        LocalTime horaFin,
+        String nombreMascota,
+        String especie,
+        String raza,
+        String nombreDueno,
+        String nombreServicio,
+        String nombreVeterinario,
+        String estadoCita,
+        Integer idEstadoCita,
+        String motivo
+    ) {}
+
+    record StatsResponse(
+        long total,
+        long pendientes,
+        long completadas,
+        long canceladas
+    ) {}
+}
