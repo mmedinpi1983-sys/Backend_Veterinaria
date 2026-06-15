@@ -7,4 +7,7 @@ import java.util.List;
 public interface DuenoRepository extends JpaRepository<Dueno, Integer> {
     List<Dueno> findByFechaEliminacionIsNull();
     Optional<Dueno> findByIdDuenoAndFechaEliminacionIsNull(Integer idDueno);
+    // Para validar que el DNI no se repita entre duenos activos
+    boolean existsByNroDocumentoAndFechaEliminacionIsNull(String nroDocumento);
+    boolean existsByNroDocumentoAndIdDuenoNotAndFechaEliminacionIsNull(String nroDocumento, Integer idDueno);
 }

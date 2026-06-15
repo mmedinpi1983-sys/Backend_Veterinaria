@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,7 @@ public class TriajeDetalleServiceImpl implements TriajeDetalleService {
         e.setAlergias(request.alergias());
         e.setIdTriaje(request.idTriaje());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -35,12 +36,14 @@ public class TriajeDetalleServiceImpl implements TriajeDetalleService {
         e.setAlergias(request.alergias());
         e.setIdTriaje(request.idTriaje());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         TriajeDetalle e = repository.findByIdTriajeDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("TriajeDetalle no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     private Response toResponse(TriajeDetalle e) { return new Response(e.getIdTriajeDetalle(), e.getTemperatura(), e.getPeso(), e.getObservaciones(), e.getAlergias(), e.getIdTriaje(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }

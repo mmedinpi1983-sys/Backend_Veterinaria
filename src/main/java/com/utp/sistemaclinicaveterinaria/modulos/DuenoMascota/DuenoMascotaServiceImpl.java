@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ public class DuenoMascotaServiceImpl implements DuenoMascotaService {
         e.setIdMascota(request.idMascota());
         e.setIdAsociado(request.idAsociado());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -31,12 +32,14 @@ public class DuenoMascotaServiceImpl implements DuenoMascotaService {
         e.setIdMascota(request.idMascota());
         e.setIdAsociado(request.idAsociado());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         DuenoMascota e = repository.findByIdDuenoMascotaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("DuenoMascota no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     private Response toResponse(DuenoMascota e) { return new Response(e.getIdDuenoMascota(), e.getIdDueno(), e.getIdMascota(), e.getIdAsociado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }

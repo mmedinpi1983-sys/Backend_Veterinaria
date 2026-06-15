@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota;
 import java.time.*;
+import java.math.BigDecimal;
 import java.util.List;
 public interface DuenoMascotaDTO {
     record Request(

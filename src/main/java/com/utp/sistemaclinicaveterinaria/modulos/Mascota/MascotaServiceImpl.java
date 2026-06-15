@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Mascota;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +29,7 @@ public class MascotaServiceImpl implements MascotaService {
         e.setNotas(request.notas());
         e.setEstado(request.estado());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -44,12 +45,14 @@ public class MascotaServiceImpl implements MascotaService {
         e.setNotas(request.notas());
         e.setEstado(request.estado());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         Mascota e = repository.findByIdMascotaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Mascota no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     @Override public List<SearchItem> buscar(String q) {
