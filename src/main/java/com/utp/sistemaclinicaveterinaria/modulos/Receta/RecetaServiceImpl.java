@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Receta;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public class RecetaServiceImpl implements RecetaService {
         e.setIdEmpleadoAsociado(request.idEmpleadoAsociado());
         e.setIdAsociado(request.idAsociado());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -33,12 +34,14 @@ public class RecetaServiceImpl implements RecetaService {
         e.setIdEmpleadoAsociado(request.idEmpleadoAsociado());
         e.setIdAsociado(request.idAsociado());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         Receta e = repository.findByIdRecetaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Receta no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     private Response toResponse(Receta e) { return new Response(e.getIdReceta(), e.getIdConsulta(), e.getFechaReceta(), e.getIdEmpleadoAsociado(), e.getIdAsociado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }

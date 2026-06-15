@@ -1,5 +1,6 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Anamnesis;
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +36,7 @@ public class AnamnesisServiceImpl implements AnamnesisService {
         e.setHistorialReproductivo(request.historialReproductivo());
         e.setReproduccionDetalle(request.reproduccionDetalle());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -58,12 +59,14 @@ public class AnamnesisServiceImpl implements AnamnesisService {
         e.setHistorialReproductivo(request.historialReproductivo());
         e.setReproduccionDetalle(request.reproduccionDetalle());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
     @Override public void eliminar(Integer id) {
         Anamnesis e = repository.findByIdAnamnesisAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Anamnesis no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
     private Response toResponse(Anamnesis e) { return new Response(e.getIdAnamnesis(), e.getIdConsulta(), e.getAntecedentes(), e.getAlergias(), e.getCirugiasAnteriores(), e.getMedicamentosActuales(), e.getAlimentacion(), e.getComportamiento(), e.getInicioSintomas(), e.getEvolucionSintomas(), e.getObservaciones(), e.getDetalleAlergias(), e.getDetalleCirugias(), e.getHistorialVacunacion(), e.getEstiloVida(), e.getHistorialReproductivo(), e.getReproduccionDetalle(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }

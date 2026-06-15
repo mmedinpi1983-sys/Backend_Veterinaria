@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
 import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.Anamnesis;
 import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisRepository;
@@ -153,7 +154,7 @@ public class AtencionServiceImpl implements AtencionService {
         e.setIdEstadoAtencion(request.idEstadoAtencion());
         e.setIdMascota(request.idMascota());
         e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(1);
+        e.setIdEmpleadoCreador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -173,6 +174,7 @@ public class AtencionServiceImpl implements AtencionService {
         e.setIdEstadoAtencion(request.idEstadoAtencion());
         e.setIdMascota(request.idMascota());
         e.setFechaModificacion(LocalDateTime.now());
+        e.setIdEmpleadoModificador(UsuarioActual.getId());
         e = repository.save(e);
         return toResponse(e);
     }
@@ -182,6 +184,7 @@ public class AtencionServiceImpl implements AtencionService {
         Atencion e = repository.findByIdAtencionAndFechaEliminacionIsNull(id)
                 .orElseThrow(() -> new ApiException("Atencion no encontrado", "NOT_FOUND"));
         e.setFechaEliminacion(LocalDateTime.now());
+        e.setIdEmpleadoEliminador(UsuarioActual.getId());
         repository.save(e);
     }
 
