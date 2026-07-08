@@ -1,12 +1,18 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolesClinica;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolesClinica.RolesClinicaDTO.RolesClinicaUpdateRequest;
+
 public interface RolesClinicaService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    List<RolesClinicaCatalogResponse> catalogo(Integer idAsociado);
+    List<RolesClinicaListResponse> listar(RolesClinicaFilterRequest f);
+    RolesClinicaDetailResponse obtenerId(Integer idRoles, Integer idAsociado);
+    void crear(RolesClinicaCreateRequest c);
+    void actualizar(Integer idRoles, RolesClinicaUpdateRequest mt);
+    void eliminar(RolesClinicaDeleteRequest e);
 }

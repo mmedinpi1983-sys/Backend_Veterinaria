@@ -1,34 +1,60 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Turno;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface TurnoDTO {
-    record Request(
-                 String nombre,
-                 LocalTime horaInicio,
-                 LocalTime horaFin,
-                 Boolean estado,
-                 Integer idAsociado
-    ) {}
-    record Response(
-                 Integer idTurno,
-                 String nombre,
-                 LocalTime horaInicio,
-                 LocalTime horaFin,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Boolean estado,
-                 Integer idAsociado,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idTurno,
-                 String nombre,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+    // catalogo
+    record TurnoCatalogResponse(
+            Integer idTurno,
+            String turno) {
+    }
+
+    // lista
+    record TurnoListResponse(
+            Integer idTurno,
+            String nombre,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            LocalDateTime fechaCreacion,
+            Boolean estado) {
+    }
+
+    // detalle
+    record TurnoDetailResponse(
+            String nombre,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            Boolean estado,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    // crear
+    record TurnoCreateRequest(
+            String nombre,
+            LocalTime horaInicio,
+            LocalTime horaFin) {
+    }
+
+    // actualizar
+    record TurnoUpdateRequest(
+            String nombre,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            Boolean estado) {
+    }
+
+    // filtro
+    record TurnoFilterRequest(
+            String nombre,
+            Boolean estado) {
+    }
+
+    // eliminar(soft-delete)
+    record TurnoDeleteRequest(
+            Integer idTurno) {
+    }
 }

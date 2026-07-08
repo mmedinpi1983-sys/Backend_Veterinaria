@@ -1,16 +1,19 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Atencion;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.DetalleCompleto;
+
 public interface AtencionService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response obtenerPorCita(Integer idCita);
+    List<AtencionListResponse> listar();
+    AtencionDetailResponse obtenerId(Integer idAtencion);
+    AtencionDetailResponse obtenerPorCita(Integer idCita);
     DetalleCompleto obtenerDetalle(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    void crear(AtencionCreateRequest c);
+    void actualizar(Integer idAtencion, AtencionUpdateRequest mt);
+    void eliminar(AtencionDeleteRequest e);
     List<HistorialView> getHistorialByMascota(Integer idMascota);
 }

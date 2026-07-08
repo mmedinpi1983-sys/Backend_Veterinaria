@@ -1,21 +1,54 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Turno;
-import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
+
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.ListItem;
+
 @RestController
 @RequestMapping("/api/turno")
 public class TurnoController {
     private final TurnoService service;
-    public TurnoController(TurnoService service) { this.service = service; }
-    @GetMapping public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar(); return ApiResponse.ResponseList("datos", data, data.size());
+
+    public TurnoController(TurnoService service) {
+        this.service = service;
     }
-    @GetMapping("/{id}") public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) { return ApiResponse.ResponseAn("dato", service.obtenerPorId(id)); }
-    @PostMapping public ApiResponse<Response> crear(@Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Creado", service.crear(request)); }
-    @PutMapping("/{id}") public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request)); }
-    @DeleteMapping("/{id}") public ApiResponse<Void> eliminar(@PathVariable Integer id) { service.eliminar(id); return ApiResponse.Response("Eliminado"); }
+
+    @GetMapping("/catalogo")
+    public ApiResponse<List<TurnoCatalogResponse>> listar() {
+        var data = service.catalogo(UsuarioActual.getAsociadoId());
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<TurnoDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id, UsuarioActual.getAsociadoId()));
+    }
+
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody TurnoCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody TurnoUpdateRequest t) {
+        service.actualizar(id, t);
+        return ApiResponse.Response("Modificado Exitosamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> eliminar(@Valid @RequestBody TurnoDeleteRequest t) {
+        service.eliminar(t);
+        return ApiResponse.Response("Eliminado con exito");
+    }
 }

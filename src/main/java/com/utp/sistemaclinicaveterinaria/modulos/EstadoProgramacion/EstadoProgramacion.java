@@ -1,6 +1,7 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EstadoProgramacion;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,5 +29,23 @@ public class EstadoProgramacion {
 
     @Column(name = "estado", nullable = false)
     private Boolean estado;
+
+    @Column(name = "fechaCreacion", nullable = false)
+    private LocalDateTime fechaCreacion;
+
+    @Column(name = "fechaModificacion")
+    private LocalDateTime fechaModificacion;
+
+    @Column(name = "fechaEliminacion")
+    private LocalDateTime fechaEliminacion;
+
+    @Column(name = "id_EmpleadoCreador", nullable = false)
+    private Integer idEmpleadoCreador;
+
+    @Column(name = "id_EmpleadoModificador")
+    private Integer idEmpleadoModificador;
+
+    @Column(name = "id_EmpleadoEliminador")
+    private Integer idEmpleadoEliminador;
 
 }

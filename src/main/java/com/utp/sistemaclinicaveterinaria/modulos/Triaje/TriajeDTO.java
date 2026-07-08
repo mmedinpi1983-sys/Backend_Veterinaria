@@ -1,38 +1,59 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Triaje;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface TriajeDTO {
-    record Request(
-                 Integer idCitaProgramada,
-                 String codigoTemporal,
-                 Integer idMascota,
-                 Integer prioridad,
-                 Boolean estado,
-                 Integer idAsociado,
-                 Integer idMetodoIngreso
-    ) {}
-    record Response(
-                 Integer idTriaje,
-                 Integer idCitaProgramada,
-                 String codigoTemporal,
-                 Integer idMascota,
-                 Integer prioridad,
-                 Boolean estado,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idAsociado,
-                 Integer idMetodoIngreso,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idTriaje,
-                 String codigoTemporal,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record TriajeCatalogResponse(
+            Integer idTriaje,
+            String codigoTemporal,
+            Integer prioridad,
+            Boolean estado) {
+    }
+
+    record TriajeListResponse(
+            Integer idTriaje,
+            String codigoTemporal,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record TriajeDetailResponse(
+            Integer idTriaje,
+            Integer idCitaProgramada,
+            String codigoTemporal,
+            Integer idMascota,
+            Integer prioridad,
+            Boolean estado,
+            Integer idMetodoIngreso,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record TriajeCreateRequest(
+            Integer idCitaProgramada,
+            String codigoTemporal,
+            Integer idMascota,
+            Integer prioridad,
+            Integer idMetodoIngreso) {
+    }
+
+    record TriajeUpdateRequest(
+            Integer idCitaProgramada,
+            String codigoTemporal,
+            Integer idMascota,
+            Integer prioridad,
+            Boolean estado,
+            Integer idMetodoIngreso) {
+    }
+
+    record TriajeFilterRequest() {
+    }
+
+    record TriajeDeleteRequest(
+            Integer idTriaje) {
+    }
 }

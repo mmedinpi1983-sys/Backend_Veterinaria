@@ -1,28 +1,43 @@
 package com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
 public interface DuenoMascotaDTO {
-    record Request(
-                 Integer idDueno,
-                 Integer idMascota,
-                 Integer idAsociado
-    ) {}
-    record Response(
-                 Integer idDuenoMascota,
-                 Integer idDueno,
-                 Integer idMascota,
-                 Integer idAsociado,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idDuenoMascota,
-                 LocalDateTime fechaCreacion
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record DuenoMascotaCatalogResponse(
+            Integer idDuenoMascota,
+            Integer idDueno,
+            Integer idMascota) {
+    }
+
+    record DuenoMascotaListResponse(
+            Integer idDuenoMascota,
+            Integer idDueno,
+            Integer idMascota,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record DuenoMascotaDetailResponse(
+            Integer idDuenoMascota,
+            Integer idDueno,
+            Integer idMascota,
+            String empleadoCreador,
+            LocalDateTime fechaCreacion,
+            String empleadoModificador,
+            LocalDateTime fechaModificacion,
+            String empleadoEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record DuenoMascotaCreateRequest(
+            Integer idDueno,
+            Integer idMascota) {
+    }
+
+    record DuenoMascotaUpdateRequest(
+            Integer idDueno,
+            Integer idMascota) {
+    }
+
+    record DuenoMascotaDeleteRequest(
+            Integer idDuenoMascota) {
+    }
 }

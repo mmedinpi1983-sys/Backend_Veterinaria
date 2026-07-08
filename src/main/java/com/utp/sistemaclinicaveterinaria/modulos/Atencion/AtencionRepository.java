@@ -1,15 +1,66 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Atencion;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 import java.util.List;
-@Repository
+
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.Projection.AtencionDetalleProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.Projection.AtencionListarProjection;
+
 public interface AtencionRepository extends JpaRepository<Atencion, Integer> {
-    List<Atencion> findByFechaEliminacionIsNull();
-    Optional<Atencion> findByIdAtencionAndFechaEliminacionIsNull(Integer idAtencion);
+
+    @Query(value = """
+            SELECT
+            a.idAtencion,
+            a.observacion,
+            a.fechaCreacion
+            FROM Atencion AS a
+            WHERE a.fechaEliminacion IS NULL
+            ORDER BY a.fechaCreacion DESC
+            """, nativeQuery = true)
+    List<AtencionListarProjection> listar();
+
+    @Query(value = """
+            SELECT
+            a.idAtencion,
+            a.id_CitaProgramada AS idCitaProgramada,
+            a.id_Triaje AS idTriaje,
+            a.fechaAtencion,
+            a.horaInicio,
+            a.horaFin,
+            a.observacion,
+            a.id_EstadoSalida AS idEstadoSalida,
+            a.id_EstadoAtencion AS idEstadoAtencion,
+            a.id_Mascota AS idMascota,
+            CONCAT(TRIM(eac.apellidoPaterno),' ', TRIM(eac.apellidoMaterno), ' ', TRIM(eac.nombreEmpleado)) AS empleadoCreador,
+            a.fechaCreacion,
+            CONCAT(TRIM(eam.apellidoPaterno),' ', TRIM(eam.apellidoMaterno), ' ', TRIM(eam.nombreEmpleado)) AS empleadoModificador,
+            a.fechaModificacion,
+            CONCAT(TRIM(eae.apellidoPaterno),' ', TRIM(eae.apellidoMaterno), ' ', TRIM(eae.nombreEmpleado)) AS empleadoEliminador,
+            a.fechaEliminacion
+            FROM Atencion AS a
+            LEFT JOIN EmpleadoAsociado AS eac ON a.id_EmpleadoCreador = eac.idEmpleadoAsociado
+            LEFT JOIN EmpleadoAsociado AS eam ON a.id_EmpleadoModificador = eam.idEmpleadoAsociado
+            LEFT JOIN EmpleadoAsociado AS eae ON a.id_EmpleadoEliminador = eae.idEmpleadoAsociado
+            WHERE a.idAtencion = :idAtencion
+            """, nativeQuery = true)
+    AtencionDetalleProjection detalle(@Param("idAtencion") Integer idAtencion);
+
     Optional<Atencion> findByIdCitaProgramadaAndFechaEliminacionIsNull(Integer idCitaProgramada);
+
+    @Query(value = """
+            UPDATE Atencion
+            SET
+            fechaEliminacion = GETDATE(),
+            id_EmpleadoEliminador = :idUsuario
+            WHERE idAtencion = :idAtencion
+            """, nativeQuery = true)
+    void eliminar(
+            @Param("idAtencion") Integer idAtencion,
+            @Param("idUsuario") Integer idUsuario);
 
     @Query(value = """
         SELECT

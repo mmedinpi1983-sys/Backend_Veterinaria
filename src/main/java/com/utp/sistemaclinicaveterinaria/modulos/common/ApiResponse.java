@@ -22,12 +22,12 @@ public class ApiResponse<T> {
         return ApiResponse.<T>builder().success(true).message(message).build();
     }
 
-    public static <T> ApiResponse<T> ResponseAn(String message, T data) {
-        return ApiResponse.<T>builder().success(true).message(message).data(data).build();
+    public static <T> ApiResponse<T> ResponseAn(T data) {
+        return ApiResponse.<T>builder().success(true).data(data).build();
     }
 
-    public static <T> ApiResponse<T> ResponseList(String message, T data, Integer count) {
-        return ApiResponse.<T>builder().success(true).message(message).data(data).count(count).build();
+    public static <T> ApiResponse<T> ResponseList(T data, Integer count) {
+        return ApiResponse.<T>builder().success(true).data(data).count(count).build();
     }
 
     public static <T> ApiResponse<T> fail(String message, String errorCode) {

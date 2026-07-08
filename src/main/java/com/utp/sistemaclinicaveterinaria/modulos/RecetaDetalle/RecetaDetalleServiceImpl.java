@@ -1,54 +1,63 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle;
+
 import org.springframework.stereotype.Service;
+
 import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.ListItem;
+
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleDTO.RecetaDetalleUpdateRequest;
+
 @Service
 public class RecetaDetalleServiceImpl implements RecetaDetalleService {
-    private final RecetaDetalleRepository repository;
-    public RecetaDetalleServiceImpl(RecetaDetalleRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdRecetaDetalle(), e.getDosis(), e.getFrecuencia(), e.getDuracion(), e.getFechaCreacion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        RecetaDetalle e = repository.findByIdRecetaDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RecetaDetalle no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final RecetaDetalleRepository r;
+    private final RecetaDetalleMapper m;
+
+    public RecetaDetalleServiceImpl(RecetaDetalleRepository r, RecetaDetalleMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        RecetaDetalle e = new RecetaDetalle();
-        e.setIdReceta(request.idReceta());
-        e.setIdMedicamento(request.idMedicamento());
-        e.setDosis(request.dosis());
-        e.setFrecuencia(request.frecuencia());
-        e.setDuracion(request.duracion());
-        e.setViaAdministracion(request.viaAdministracion());
-        e.setIndicacionesEspecificas(request.indicacionesEspecificas());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<RecetaDetalleCatalogResponse> catalogo() {
+        return m.toCatalogResponseList(r.catalogo());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        RecetaDetalle e = repository.findByIdRecetaDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RecetaDetalle no encontrado", "NOT_FOUND"));
-        e.setIdReceta(request.idReceta());
-        e.setIdMedicamento(request.idMedicamento());
-        e.setDosis(request.dosis());
-        e.setFrecuencia(request.frecuencia());
-        e.setDuracion(request.duracion());
-        e.setViaAdministracion(request.viaAdministracion());
-        e.setIndicacionesEspecificas(request.indicacionesEspecificas());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<RecetaDetalleListResponse> listar() {
+        return m.toListResponseList(r.listar());
     }
-    @Override public void eliminar(Integer id) {
-        RecetaDetalle e = repository.findByIdRecetaDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RecetaDetalle no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+
+    @Override
+    public RecetaDetalleDetailResponse obtenerId(Integer id) {
+        return m.toDetailResponse(r.detalle(id));
     }
-    private Response toResponse(RecetaDetalle e) { return new Response(e.getIdRecetaDetalle(), e.getIdReceta(), e.getIdMedicamento(), e.getDosis(), e.getFrecuencia(), e.getDuracion(), e.getViaAdministracion(), e.getIndicacionesEspecificas(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(RecetaDetalleCreateRequest c) {
+        RecetaDetalle entity = m.toEntity(c);
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer id, RecetaDetalleUpdateRequest t) {
+        RecetaDetalle entity = r.getReferenceById(id);
+        m.updateEntity(entity, t);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(RecetaDetalleDeleteRequest e) {
+        r.eliminar(e.idRecetaDetalle(), UsuarioActual.getId());
+    }
 }

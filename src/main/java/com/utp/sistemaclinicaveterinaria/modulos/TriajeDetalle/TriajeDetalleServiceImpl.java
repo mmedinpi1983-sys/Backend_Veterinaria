@@ -1,50 +1,62 @@
 package com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleDTO.TriajeDetalleUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class TriajeDetalleServiceImpl implements TriajeDetalleService {
-    private final TriajeDetalleRepository repository;
-    public TriajeDetalleServiceImpl(TriajeDetalleRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdTriajeDetalle(), e.getObservaciones(), e.getAlergias(), e.getFechaCreacion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        TriajeDetalle e = repository.findByIdTriajeDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("TriajeDetalle no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final TriajeDetalleRepository r;
+    private final TriajeDetalleMapper m;
+
+    public TriajeDetalleServiceImpl(TriajeDetalleRepository r, TriajeDetalleMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        TriajeDetalle e = new TriajeDetalle();
-        e.setTemperatura(request.temperatura());
-        e.setPeso(request.peso());
-        e.setObservaciones(request.observaciones());
-        e.setAlergias(request.alergias());
-        e.setIdTriaje(request.idTriaje());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<TriajeDetalleCatalogResponse> catalogo() {
+        return m.TriajeDetalleCatalogoMapperList(r.catalogo());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        TriajeDetalle e = repository.findByIdTriajeDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("TriajeDetalle no encontrado", "NOT_FOUND"));
-        e.setTemperatura(request.temperatura());
-        e.setPeso(request.peso());
-        e.setObservaciones(request.observaciones());
-        e.setAlergias(request.alergias());
-        e.setIdTriaje(request.idTriaje());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<TriajeDetalleListResponse> listar(TriajeDetalleFilterRequest f) {
+        return m.TriajeDetalleListMapperList(r.listar());
     }
-    @Override public void eliminar(Integer id) {
-        TriajeDetalle e = repository.findByIdTriajeDetalleAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("TriajeDetalle no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+
+    @Override
+    public TriajeDetalleDetailResponse obtenerId(Integer idTriajeDetalle) {
+        return m.TriajeDetalleDetailMapper(r.detalle(idTriajeDetalle));
     }
-    private Response toResponse(TriajeDetalle e) { return new Response(e.getIdTriajeDetalle(), e.getTemperatura(), e.getPeso(), e.getObservaciones(), e.getAlergias(), e.getIdTriaje(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(TriajeDetalleCreateRequest c) {
+        TriajeDetalle entity = m.toEntity(c);
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idTriajeDetalle, TriajeDetalleUpdateRequest mt) {
+        TriajeDetalle entity = r.getReferenceById(idTriajeDetalle);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(TriajeDetalleDeleteRequest e) {
+        r.eliminar(e.idTriajeDetalle(), UsuarioActual.getId());
+    }
 }

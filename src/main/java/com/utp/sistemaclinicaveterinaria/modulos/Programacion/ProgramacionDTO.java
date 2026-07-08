@@ -1,42 +1,21 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Programacion;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface ProgramacionDTO {
-    record Request(
-                 LocalDate fecha,
-                 Integer idTurno,
-                 Integer idEmpleadoRegistrador,
-                 Integer idEstadoProgramacion,
-                 Integer idAsociado,
-                 Integer idCategoria,
-                 Integer idServicio,
-                 String ambiente,
-                 String descripcion
-    ) {}
-    record Response(
-                 Integer idProgramacion,
-                 LocalDate fecha,
-                 Integer idTurno,
-                 Integer idEmpleadoRegistrador,
-                 Integer idEstadoProgramacion,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idAsociado,
-                 Integer idCategoria,
-                 Integer idServicio,
-                 String ambiente,
-                 String descripcion,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idProgramacion,
-                 String ambiente,
-                 String descripcion,
-                 LocalDateTime fechaCreacion
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+    record ProgramacionCatalogResponse(Integer idProgramacion, String ambiente, String descripcion) {}
+    record ProgramacionListResponse(Integer idProgramacion, String ambiente, String descripcion, LocalDateTime fechaCreacion) {}
+    record ProgramacionDetailResponse(
+            Integer idProgramacion, LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
+            Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
+            String ambiente, String descripcion,
+            String usuarioCreador, LocalDateTime fechaCreacion,
+            String usuarioModificador, LocalDateTime fechaModificacion,
+            String usuarioEliminador, LocalDateTime fechaEliminacion) {}
+    record ProgramacionCreateRequest(LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
+            Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
+            String ambiente, String descripcion) {}
+    record ProgramacionUpdateRequest(LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
+            Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
+            String ambiente, String descripcion) {}
+    record ProgramacionDeleteRequest(Integer idProgramacion) {}
 }

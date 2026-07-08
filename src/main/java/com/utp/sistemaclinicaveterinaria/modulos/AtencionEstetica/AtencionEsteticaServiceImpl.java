@@ -1,48 +1,56 @@
 package com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class AtencionEsteticaServiceImpl implements AtencionEsteticaService {
-    private final AtencionEsteticaRepository repository;
-    public AtencionEsteticaServiceImpl(AtencionEsteticaRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdEstetica(), e.getDetalleServicio(), e.getObservaciones(), e.getFechaCreacion(), e.getEstado())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        AtencionEstetica e = repository.findByIdEsteticaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("AtencionEstetica no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final AtencionEsteticaRepository r;
+    private final AtencionEsteticaMapper m;
+
+    public AtencionEsteticaServiceImpl(AtencionEsteticaRepository r, AtencionEsteticaMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        AtencionEstetica e = new AtencionEstetica();
-        e.setIdAtencion(request.idAtencion());
-        e.setIdServicio(request.idServicio());
-        e.setDetalleServicio(request.detalleServicio());
-        e.setObservaciones(request.observaciones());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<AtencionEsteticaListResponse> listar() {
+        return m.AtencionEsteticaListMapperList(r.listar());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        AtencionEstetica e = repository.findByIdEsteticaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("AtencionEstetica no encontrado", "NOT_FOUND"));
-        e.setIdAtencion(request.idAtencion());
-        e.setIdServicio(request.idServicio());
-        e.setDetalleServicio(request.detalleServicio());
-        e.setObservaciones(request.observaciones());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public AtencionEsteticaDetailResponse obtenerId(Integer idEstetica) {
+        return m.AtencionEsteticaDetailMapper(r.detalle(idEstetica));
     }
-    @Override public void eliminar(Integer id) {
-        AtencionEstetica e = repository.findByIdEsteticaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("AtencionEstetica no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        repository.save(e);
+
+    @Override
+    public void crear(AtencionEsteticaCreateRequest c) {
+        AtencionEstetica entity = m.toEntity(c);
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        r.save(entity);
     }
-    private Response toResponse(AtencionEstetica e) { return new Response(e.getIdEstetica(), e.getIdAtencion(), e.getIdServicio(), e.getDetalleServicio(), e.getObservaciones(), e.getIdAsociado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getEstado(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void actualizar(Integer idEstetica, AtencionEsteticaUpdateRequest mt) {
+        AtencionEstetica entity = r.getReferenceById(idEstetica);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(AtencionEsteticaDeleteRequest e) {
+        r.eliminar(e.idEstetica(), UsuarioActual.getId());
+    }
 }

@@ -1,12 +1,15 @@
 package com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionEstetica.AtencionEsteticaDTO.AtencionEsteticaUpdateRequest;
+
 public interface AtencionEsteticaService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    List<AtencionEsteticaListResponse> listar();
+    AtencionEsteticaDetailResponse obtenerId(Integer idEstetica);
+    void crear(AtencionEsteticaCreateRequest c);
+    void actualizar(Integer idEstetica, AtencionEsteticaUpdateRequest mt);
+    void eliminar(AtencionEsteticaDeleteRequest e);
 }

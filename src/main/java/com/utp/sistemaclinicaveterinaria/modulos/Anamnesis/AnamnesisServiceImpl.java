@@ -1,73 +1,55 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Anamnesis;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class AnamnesisServiceImpl implements AnamnesisService {
-    private final AnamnesisRepository repository;
-    public AnamnesisServiceImpl(AnamnesisRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdAnamnesis(), e.getAntecedentes(), e.getMedicamentosActuales(), e.getAlimentacion(), e.getFechaCreacion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        Anamnesis e = repository.findByIdAnamnesisAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Anamnesis no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final AnamnesisRepository r;
+    private final AnamnesisMapper m;
+
+    public AnamnesisServiceImpl(AnamnesisRepository r, AnamnesisMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        Anamnesis e = new Anamnesis();
-        e.setIdConsulta(request.idConsulta());
-        e.setAntecedentes(request.antecedentes());
-        e.setAlergias(request.alergias());
-        e.setCirugiasAnteriores(request.cirugiasAnteriores());
-        e.setMedicamentosActuales(request.medicamentosActuales());
-        e.setAlimentacion(request.alimentacion());
-        e.setComportamiento(request.comportamiento());
-        e.setInicioSintomas(request.inicioSintomas());
-        e.setEvolucionSintomas(request.evolucionSintomas());
-        e.setObservaciones(request.observaciones());
-        e.setDetalleAlergias(request.detalleAlergias());
-        e.setDetalleCirugias(request.detalleCirugias());
-        e.setHistorialVacunacion(request.historialVacunacion());
-        e.setEstiloVida(request.estiloVida());
-        e.setHistorialReproductivo(request.historialReproductivo());
-        e.setReproduccionDetalle(request.reproduccionDetalle());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<AnamnesisListResponse> listar() {
+        return m.AnamnesisListMapperList(r.listar());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        Anamnesis e = repository.findByIdAnamnesisAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Anamnesis no encontrado", "NOT_FOUND"));
-        e.setIdConsulta(request.idConsulta());
-        e.setAntecedentes(request.antecedentes());
-        e.setAlergias(request.alergias());
-        e.setCirugiasAnteriores(request.cirugiasAnteriores());
-        e.setMedicamentosActuales(request.medicamentosActuales());
-        e.setAlimentacion(request.alimentacion());
-        e.setComportamiento(request.comportamiento());
-        e.setInicioSintomas(request.inicioSintomas());
-        e.setEvolucionSintomas(request.evolucionSintomas());
-        e.setObservaciones(request.observaciones());
-        e.setDetalleAlergias(request.detalleAlergias());
-        e.setDetalleCirugias(request.detalleCirugias());
-        e.setHistorialVacunacion(request.historialVacunacion());
-        e.setEstiloVida(request.estiloVida());
-        e.setHistorialReproductivo(request.historialReproductivo());
-        e.setReproduccionDetalle(request.reproduccionDetalle());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public AnamnesisDetailResponse obtenerId(Integer idAnamnesis) {
+        return m.AnamnesisDetailMapper(r.detalle(idAnamnesis));
     }
-    @Override public void eliminar(Integer id) {
-        Anamnesis e = repository.findByIdAnamnesisAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Anamnesis no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+
+    @Override
+    public void crear(AnamnesisCreateRequest c) {
+        Anamnesis entity = m.toEntity(c);
+        entity.setFechaCreacion(LocalDateTime.now());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        r.save(entity);
     }
-    private Response toResponse(Anamnesis e) { return new Response(e.getIdAnamnesis(), e.getIdConsulta(), e.getAntecedentes(), e.getAlergias(), e.getCirugiasAnteriores(), e.getMedicamentosActuales(), e.getAlimentacion(), e.getComportamiento(), e.getInicioSintomas(), e.getEvolucionSintomas(), e.getObservaciones(), e.getDetalleAlergias(), e.getDetalleCirugias(), e.getHistorialVacunacion(), e.getEstiloVida(), e.getHistorialReproductivo(), e.getReproduccionDetalle(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void actualizar(Integer idAnamnesis, AnamnesisUpdateRequest mt) {
+        Anamnesis entity = r.getReferenceById(idAnamnesis);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(AnamnesisDeleteRequest e) {
+        r.eliminar(e.idAnamnesis(), UsuarioActual.getId());
+    }
 }

@@ -1,42 +1,64 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Presentacion;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Presentacion.PresentacionDTO.PresentacionUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class PresentacionServiceImpl implements PresentacionService {
-    private final PresentacionRepository repository;
-    public PresentacionServiceImpl(PresentacionRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdPresentacion(), e.getNombre(), e.getFechaCreacion(), e.getEstado())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        Presentacion e = repository.findByIdPresentacionAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Presentacion no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final PresentacionRepository r;
+    private final PresentacionMapper m;
+
+    public PresentacionServiceImpl(PresentacionRepository r, PresentacionMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        Presentacion e = new Presentacion();
-        e.setNombre(request.nombre());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<PresentacionCatalogResponse> catalogo(Integer idAsociado) {
+        return m.PresentacionCatalogoMapperList(r.catalogo(idAsociado));
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        Presentacion e = repository.findByIdPresentacionAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Presentacion no encontrado", "NOT_FOUND"));
-        e.setNombre(request.nombre());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<PresentacionListResponse> listar(PresentacionFilterRequest f) {
+        return m.PresentacionListMapperList(r.listar(UsuarioActual.getAsociadoId()));
     }
-    @Override public void eliminar(Integer id) {
-        Presentacion e = repository.findByIdPresentacionAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Presentacion no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        repository.save(e);
+
+    @Override
+    public PresentacionDetailResponse obtenerId(Integer idPresentacion, Integer idAsociado) {
+        return m.PresentacionDetailMapper(r.detalle(idPresentacion, idAsociado));
     }
-    private Response toResponse(Presentacion e) { return new Response(e.getIdPresentacion(), e.getNombre(), e.getIdAsociado(), e.getEstado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(PresentacionCreateRequest c) {
+        Presentacion entity = m.toEntity(c);
+        entity.setEstado(true);
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idPresentacion, PresentacionUpdateRequest mt) {
+        Presentacion entity = r.getReferenceById(idPresentacion);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(PresentacionDeleteRequest e) {
+        r.eliminar(e.idPresentacion(), UsuarioActual.getId(), UsuarioActual.getAsociadoId());
+    }
 }

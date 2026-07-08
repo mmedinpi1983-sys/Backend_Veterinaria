@@ -1,45 +1,65 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Atencion;
 import java.time.*;
-import java.math.BigDecimal;
 import java.util.List;
+
 public interface AtencionDTO {
-    record Request(
-                 Integer idCitaProgramada,
-                 Integer idTriaje,
-                 Integer idAsociado,
-                 LocalDate fechaAtencion,
-                 LocalTime horaInicio,
-                 LocalTime horaFin,
-                 String observacion,
-                 Integer idEstadoSalida,
-                 Integer idEstadoAtencion,
-                 Integer idMascota
-    ) {}
-    record Response(
-                 Integer idAtencion,
-                 Integer idCitaProgramada,
-                 Integer idTriaje,
-                 Integer idAsociado,
-                 LocalDate fechaAtencion,
-                 LocalTime horaInicio,
-                 LocalTime horaFin,
-                 String observacion,
-                 Integer idEstadoSalida,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idEstadoAtencion,
-                 Integer idMascota,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idAtencion,
-                 String observacion,
-                 LocalDateTime fechaCreacion
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record AtencionListResponse(
+            Integer idAtencion,
+            String observacion,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record AtencionDetailResponse(
+            Integer idAtencion,
+            Integer idCitaProgramada,
+            Integer idTriaje,
+            LocalDate fechaAtencion,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            String observacion,
+            Integer idEstadoSalida,
+            Integer idEstadoAtencion,
+            Integer idMascota,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record AtencionCreateRequest(
+            Integer idCitaProgramada,
+            Integer idTriaje,
+            LocalDate fechaAtencion,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            String observacion,
+            Integer idEstadoSalida,
+            Integer idEstadoAtencion,
+            Integer idMascota) {
+    }
+
+    record AtencionUpdateRequest(
+            Integer idCitaProgramada,
+            Integer idTriaje,
+            LocalDate fechaAtencion,
+            LocalTime horaInicio,
+            LocalTime horaFin,
+            String observacion,
+            Integer idEstadoSalida,
+            Integer idEstadoAtencion,
+            Integer idMascota) {
+    }
+
+    record AtencionFilterRequest(
+            String observacion) {
+    }
+
+    record AtencionDeleteRequest(
+            Integer idAtencion) {
+    }
 
     record TriajeInfo(
         Integer idTriaje, String codigoTemporal, Integer prioridad, Integer idMetodoIngreso,
@@ -65,11 +85,11 @@ public interface AtencionDTO {
     ) {}
 
     record RecetaInfo(
-        Integer idReceta, java.time.LocalDateTime fechaReceta, List<MedicamentoReceta> detalle
+        Integer idReceta, LocalDateTime fechaReceta, List<MedicamentoReceta> detalle
     ) {}
 
     record DetalleCompleto(
-        Response atencion,
+        AtencionDetailResponse atencion,
         TriajeInfo triaje,
         ConsultaInfo consulta,
         AnamnesisInfo anamnesis,

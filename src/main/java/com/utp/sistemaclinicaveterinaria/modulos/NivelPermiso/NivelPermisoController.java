@@ -1,21 +1,60 @@
 package com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso;
-import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
+
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.NivelPermisoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelPermiso.NivelPermisoDTO.ListItem;
+
 @RestController
 @RequestMapping("/api/nivelpermiso")
 public class NivelPermisoController {
     private final NivelPermisoService service;
-    public NivelPermisoController(NivelPermisoService service) { this.service = service; }
-    @GetMapping public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar(); return ApiResponse.ResponseList("datos", data, data.size());
+
+    public NivelPermisoController(NivelPermisoService service) {
+        this.service = service;
     }
-    @GetMapping("/{id}") public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) { return ApiResponse.ResponseAn("dato", service.obtenerPorId(id)); }
-    @PostMapping public ApiResponse<Response> crear(@Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Creado", service.crear(request)); }
-    @PutMapping("/{id}") public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request)); }
-    @DeleteMapping("/{id}") public ApiResponse<Void> eliminar(@PathVariable Integer id) { service.eliminar(id); return ApiResponse.Response("Eliminado"); }
+
+    @GetMapping("/catalogo")
+    public ApiResponse<List<NivelPermisoCatalogResponse>> catalogo() {
+        var data = service.catalogo();
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping
+    public ApiResponse<List<NivelPermisoListResponse>> listar() {
+        var data = service.listar();
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<NivelPermisoDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id));
+    }
+
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody NivelPermisoCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody NivelPermisoUpdateRequest t) {
+        service.actualizar(id, t);
+        return ApiResponse.Response("Modificado Exitosamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> eliminar(@Valid @RequestBody NivelPermisoDeleteRequest t) {
+        service.eliminar(t);
+        return ApiResponse.Response("Eliminado con exito");
+    }
 }

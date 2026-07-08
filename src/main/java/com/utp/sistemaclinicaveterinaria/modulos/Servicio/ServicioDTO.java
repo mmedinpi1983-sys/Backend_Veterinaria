@@ -1,38 +1,60 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Servicio;
 import java.time.*;
 import java.math.BigDecimal;
-import java.util.List;
+
 public interface ServicioDTO {
-    record Request(
-                 String nombre,
-                 Integer idCategoria,
-                 Integer idAsociado,
-                 BigDecimal precio,
-                 Boolean requiereTriaje,
-                 Boolean estado,
-                 Integer duracionEstimada
-    ) {}
-    record Response(
-                 Integer idServicio,
-                 String nombre,
-                 Integer idCategoria,
-                 Integer idAsociado,
-                 BigDecimal precio,
-                 Boolean requiereTriaje,
-                 Boolean estado,
-                 Integer duracionEstimada,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idServicio,
-                 String nombre,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record ServicioCatalogResponse(
+            Integer idServicio,
+            String nombre) {
+    }
+
+    record ServicioListResponse(
+            Integer idServicio,
+            String nombre,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record ServicioDetailResponse(
+            Integer idServicio,
+            String nombre,
+            Integer idCategoria,
+            BigDecimal precio,
+            Boolean requiereTriaje,
+            Boolean estado,
+            Integer duracionEstimada,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record ServicioCreateRequest(
+            String nombre,
+            Integer idCategoria,
+            BigDecimal precio,
+            Boolean requiereTriaje,
+            Integer duracionEstimada) {
+    }
+
+    record ServicioUpdateRequest(
+            String nombre,
+            Integer idCategoria,
+            BigDecimal precio,
+            Boolean requiereTriaje,
+            Boolean estado,
+            Integer duracionEstimada) {
+    }
+
+    record ServicioFilterRequest(
+            String nombre,
+            Boolean estado) {
+    }
+
+    record ServicioDeleteRequest(
+            Integer idServicio) {
+    }
 }

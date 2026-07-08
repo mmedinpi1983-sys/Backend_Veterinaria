@@ -1,71 +1,70 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Atencion;
 
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Response;
+
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.DetalleCompleto;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.ListItem;
 
-// Controlador de atención clínica - gestiona el flujo completo de atención: triaje, anamnesis, consulta y receta
+import jakarta.validation.Valid;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/atencion")
 public class AtencionController {
-
     private final AtencionService service;
 
-    public AtencionController(AtencionService service) { this.service = service; }
+    public AtencionController(AtencionService service) {
+        this.service = service;
+    }
 
-    // GET /api/atencion - lista todas las atenciones registradas
     @GetMapping
-    public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar();
-        return ApiResponse.ResponseList("datos", data, data.size());
+    public ApiResponse<List<AtencionListResponse>> listar() {
+        var data = service.listar();
+        return ApiResponse.ResponseList(data, data.size());
     }
 
-    // GET /api/atencion/{id} - obtiene una atención por ID
     @GetMapping("/{id}")
-    public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) {
-        return ApiResponse.ResponseAn("dato", service.obtenerPorId(id));
+    public ApiResponse<AtencionDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id));
     }
 
-    // GET /api/atencion/{id}/detalle - retorna la atención completa con triaje, anamnesis, consulta y receta
     @GetMapping("/{id}/detalle")
     public ApiResponse<DetalleCompleto> obtenerDetalle(@PathVariable Integer id) {
-        return ApiResponse.ResponseAn("detalle", service.obtenerDetalle(id));
+        return ApiResponse.ResponseAn(service.obtenerDetalle(id));
     }
 
-    // GET /api/atencion/por-cita/{idCita} - busca la atención vinculada a una cita específica
     @GetMapping("/por-cita/{idCita}")
-    public ApiResponse<Response> obtenerPorCita(@PathVariable Integer idCita) {
-        return ApiResponse.ResponseAn("dato", service.obtenerPorCita(idCita));
+    public ApiResponse<AtencionDetailResponse> obtenerPorCita(@PathVariable Integer idCita) {
+        return ApiResponse.ResponseAn(service.obtenerPorCita(idCita));
     }
 
-    // GET /api/atencion/historial/{idMascota} - historial clínico completo de una mascota
     @GetMapping("/historial/{idMascota}")
     public ApiResponse<List<HistorialView>> getHistorial(@PathVariable Integer idMascota) {
-        List<HistorialView> data = service.getHistorialByMascota(idMascota);
-        return ApiResponse.ResponseList("historial", data, data.size());
+        var data = service.getHistorialByMascota(idMascota);
+        return ApiResponse.ResponseList(data, data.size());
     }
 
-    // POST /api/atencion - registra una nueva atención
-    @PostMapping
-    public ApiResponse<Response> crear(@Valid @RequestBody Request request) {
-        return ApiResponse.ResponseAn("Creado", service.crear(request));
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody AtencionCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
     }
 
-    // PUT /api/atencion/{id} - actualiza una atención existente
     @PutMapping("/{id}")
-    public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) {
-        return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request));
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody AtencionUpdateRequest t) {
+        service.actualizar(id, t);
+        return ApiResponse.Response("Modificado Exitosamente");
     }
 
-    // DELETE /api/atencion/{id} - eliminación lógica
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> eliminar(@PathVariable Integer id) {
-        service.eliminar(id);
-        return ApiResponse.Response("Eliminado");
+    public ApiResponse<Void> eliminar(@Valid @RequestBody AtencionDeleteRequest t) {
+        service.eliminar(t);
+        return ApiResponse.Response("Eliminado con exito");
     }
 }

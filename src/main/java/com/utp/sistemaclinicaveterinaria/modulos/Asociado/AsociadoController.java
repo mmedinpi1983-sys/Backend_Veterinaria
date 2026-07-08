@@ -1,22 +1,53 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Asociado;
-import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.Response;
+import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.AsociadoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.AsociadoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.AsociadoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.AsociadoListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.AsociadoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
-import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Asociado.AsociadoDTO.ListItem;
+
+import jakarta.validation.Valid;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/asociado")
 public class AsociadoController {
     private final AsociadoService service;
-    public AsociadoController(AsociadoService service) { this.service = service; }
-    @GetMapping public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar(); return ApiResponse.ResponseList("datos", data, data.size());
+
+    public AsociadoController(AsociadoService service) {
+        this.service = service;
     }
-    @GetMapping("/{id}") public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) { return ApiResponse.ResponseAn("dato", service.obtenerPorId(id)); }
-    @PostMapping public ApiResponse<Response> crear(@Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Creado", service.crear(request)); }
-    @PutMapping("/{id}") public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request)); }
-    @DeleteMapping("/{id}") public ApiResponse<Void> eliminar(@PathVariable Integer id) { service.eliminar(id); return ApiResponse.Response("Eliminado"); }
+
+    @GetMapping
+    public ApiResponse<List<AsociadoListResponse>> listar() {
+        var data = service.listar();
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<AsociadoDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id));
+    }
+
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody AsociadoCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody AsociadoUpdateRequest t) {
+        service.actualizar(id, t);
+        return ApiResponse.Response("Modificado Exitosamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> eliminar(@Valid @RequestBody AsociadoDeleteRequest t) {
+        service.eliminar(t);
+        return ApiResponse.Response("Eliminado con exito");
+    }
 }

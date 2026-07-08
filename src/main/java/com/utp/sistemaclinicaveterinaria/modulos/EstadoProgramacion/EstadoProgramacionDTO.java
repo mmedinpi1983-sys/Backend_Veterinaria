@@ -1,26 +1,52 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EstadoProgramacion;
+
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface EstadoProgramacionDTO {
-    record Request(
-                 String nombre,
-                 String descripcion,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record Response(
-                 Integer idEstadoProgramacion,
-                 String nombre,
-                 String descripcion,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record ListItem(
-                 Integer idEstadoProgramacion,
-                 String nombre,
-                 String descripcion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record EstadoProgramacionCatalogResponse(
+            Integer idEstadoProgramacion,
+            String nombre) {
+    }
+
+    record EstadoProgramacionListResponse(
+            Integer idEstadoProgramacion,
+            String nombre,
+            String descripcion,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record EstadoProgramacionDetailResponse(
+            Integer idEstadoProgramacion,
+            String nombre,
+            String descripcion,
+            Boolean estado,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record EstadoProgramacionCreateRequest(
+            String nombre,
+            String descripcion) {
+    }
+
+    record EstadoProgramacionUpdateRequest(
+            String nombre,
+            String descripcion,
+            Boolean estado) {
+    }
+
+    record EstadoProgramacionFilterRequest(
+            String nombre,
+            Boolean estado) {
+    }
+
+    record EstadoProgramacionDeleteRequest(
+            Integer idEstadoProgramacion) {
+    }
 }

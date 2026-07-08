@@ -1,26 +1,39 @@
 package com.utp.sistemaclinicaveterinaria.modulos.MetodoIngreso;
-import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface MetodoIngresoDTO {
-    record Request(
-                 String nombre,
-                 String descripcion,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record Response(
-                 Integer idMetodoIngreso,
-                 String nombre,
-                 String descripcion,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record ListItem(
-                 Integer idMetodoIngreso,
-                 String nombre,
-                 String descripcion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record MetodoIngresoCatalogResponse(
+            Integer idMetodoIngreso,
+            String nombre) {
+    }
+
+    record MetodoIngresoListResponse(
+            Integer idMetodoIngreso,
+            String nombre,
+            String descripcion,
+            Boolean estado) {
+    }
+
+    record MetodoIngresoDetailResponse(
+            Integer idMetodoIngreso,
+            String nombre,
+            String descripcion,
+            Boolean estado) {
+    }
+
+    record MetodoIngresoCreateRequest(
+            String nombre,
+            String descripcion,
+            Boolean estado) {
+    }
+
+    record MetodoIngresoUpdateRequest(
+            String nombre,
+            String descripcion,
+            Boolean estado) {
+    }
+
+    record MetodoIngresoDeleteRequest(
+            Integer idMetodoIngreso) {
+    }
 }

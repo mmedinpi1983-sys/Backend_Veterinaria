@@ -1,21 +1,61 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolPermiso;
-import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
+
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.ListItem;
+
 @RestController
 @RequestMapping("/api/rolpermiso")
 public class RolPermisoController {
     private final RolPermisoService service;
-    public RolPermisoController(RolPermisoService service) { this.service = service; }
-    @GetMapping public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar(); return ApiResponse.ResponseList("datos", data, data.size());
+
+    public RolPermisoController(RolPermisoService service) {
+        this.service = service;
     }
-    @GetMapping("/{id}") public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) { return ApiResponse.ResponseAn("dato", service.obtenerPorId(id)); }
-    @PostMapping public ApiResponse<Response> crear(@Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Creado", service.crear(request)); }
-    @PutMapping("/{id}") public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request)); }
-    @DeleteMapping("/{id}") public ApiResponse<Void> eliminar(@PathVariable Integer id) { service.eliminar(id); return ApiResponse.Response("Eliminado"); }
+
+    @GetMapping("/catalogo")
+    public ApiResponse<List<RolPermisoCatalogResponse>> catalogo() {
+        var data = service.catalogo(UsuarioActual.getAsociadoId());
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping
+    public ApiResponse<List<RolPermisoListResponse>> listar() {
+        var data = service.listar(new RolPermisoDTO.RolPermisoFilterRequest());
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<RolPermisoDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id, UsuarioActual.getAsociadoId()));
+    }
+
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody RolPermisoCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody RolPermisoUpdateRequest t) {
+        service.actualizar(id, t);
+        return ApiResponse.Response("Modificado Exitosamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> eliminar(@Valid @RequestBody RolPermisoDeleteRequest t) {
+        service.eliminar(t);
+        return ApiResponse.Response("Eliminado con exito");
+    }
 }

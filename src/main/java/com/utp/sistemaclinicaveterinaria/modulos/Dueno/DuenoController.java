@@ -1,21 +1,63 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Dueno;
-import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
+
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.DuenoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Dueno.DuenoDTO.ListItem;
+
 @RestController
 @RequestMapping("/api/dueno")
 public class DuenoController {
     private final DuenoService service;
-    public DuenoController(DuenoService service) { this.service = service; }
-    @GetMapping public ApiResponse<List<ListItem>> listar() {
-        List<ListItem> data = service.listar(); return ApiResponse.ResponseList("datos", data, data.size());
+
+    public DuenoController(DuenoService service) {
+        this.service = service;
     }
-    @GetMapping("/{id}") public ApiResponse<Response> obtenerPorId(@PathVariable Integer id) { return ApiResponse.ResponseAn("dato", service.obtenerPorId(id)); }
-    @PostMapping public ApiResponse<Response> crear(@Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Creado", service.crear(request)); }
-    @PutMapping("/{id}") public ApiResponse<Response> actualizar(@PathVariable Integer id, @Valid @RequestBody Request request) { return ApiResponse.ResponseAn("Actualizado", service.actualizar(id, request)); }
-    @DeleteMapping("/{id}") public ApiResponse<Void> eliminar(@PathVariable Integer id) { service.eliminar(id); return ApiResponse.Response("Eliminado"); }
+
+    @GetMapping("/catalogo")
+    public ApiResponse<List<DuenoCatalogResponse>> catalogo() {
+        var data = service.catalogo(UsuarioActual.getAsociadoId());
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping
+    public ApiResponse<List<DuenoListResponse>> listar(
+            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "") String q) {
+        var data = service.listar(new DuenoDTO.DuenoFilterRequest(q, estado));
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<DuenoDetailResponse> obtenerPorId(@PathVariable Integer id) {
+        return ApiResponse.ResponseAn(service.obtenerId(id, UsuarioActual.getAsociadoId()));
+    }
+
+    @PostMapping("/crear")
+    public ApiResponse<Void> crear(@Valid @RequestBody DuenoCreateRequest c) {
+        service.crear(c);
+        return ApiResponse.Response("Creado Exitosamente");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> actualizar(@PathVariable Integer id, @Valid @RequestBody DuenoUpdateRequest u) {
+        service.actualizar(id, u);
+        return ApiResponse.Response("Modificado Exitosamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> eliminar(@Valid @RequestBody DuenoDeleteRequest d) {
+        service.eliminar(d);
+        return ApiResponse.Response("Eliminado con exito");
+    }
 }

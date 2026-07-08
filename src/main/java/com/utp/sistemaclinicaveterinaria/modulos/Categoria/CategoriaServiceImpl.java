@@ -1,42 +1,64 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Categoria;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Categoria.CategoriaDTO.CategoriaUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class CategoriaServiceImpl implements CategoriaService {
-    private final CategoriaRepository repository;
-    public CategoriaServiceImpl(CategoriaRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdCategoria(), e.getNombreCategoria(), e.getFechaCreacion(), e.getEstado())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        Categoria e = repository.findByIdCategoriaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Categoria no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final CategoriaRepository r;
+    private final CategoriaMapper m;
+
+    public CategoriaServiceImpl(CategoriaRepository r, CategoriaMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        Categoria e = new Categoria();
-        e.setNombreCategoria(request.nombreCategoria());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<CategoriaCatalogResponse> catalogo(Integer idAsociado) {
+        return m.CategoriaCatalogoMapperList(r.catalogo(idAsociado));
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        Categoria e = repository.findByIdCategoriaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Categoria no encontrado", "NOT_FOUND"));
-        e.setNombreCategoria(request.nombreCategoria());
-        e.setIdAsociado(request.idAsociado());
-        e.setEstado(request.estado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<CategoriaListResponse> listar(CategoriaFilterRequest f) {
+        return m.CategoriaListMapperList(r.listar(UsuarioActual.getAsociadoId(), f.estado(), f.nombreCategoria()));
     }
-    @Override public void eliminar(Integer id) {
-        Categoria e = repository.findByIdCategoriaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Categoria no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        repository.save(e);
+
+    @Override
+    public CategoriaDetailResponse obtenerId(Integer idCategoria, Integer idAsociado) {
+        return m.CategoriaDetailMapper(r.detalle(idCategoria, idAsociado));
     }
-    private Response toResponse(Categoria e) { return new Response(e.getIdCategoria(), e.getNombreCategoria(), e.getIdAsociado(), e.getEstado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(CategoriaCreateRequest c) {
+        Categoria entity = m.toEntity(c);
+        entity.setEstado(true);
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idCategoria, CategoriaUpdateRequest mt) {
+        Categoria entity = r.getReferenceById(idCategoria);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(CategoriaDeleteRequest e) {
+        r.eliminar(e.idCategoria(), UsuarioActual.getId(), UsuarioActual.getAsociadoId());
+    }
 }

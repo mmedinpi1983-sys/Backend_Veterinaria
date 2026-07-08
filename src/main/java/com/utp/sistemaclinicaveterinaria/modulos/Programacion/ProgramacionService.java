@@ -1,12 +1,17 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Programacion;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionUpdateRequest;
+
 public interface ProgramacionService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    List<ProgramacionCatalogResponse> catalogo(Integer idAsociado);
+    List<ProgramacionListResponse> listar();
+    ProgramacionDetailResponse obtenerId(Integer id, Integer idAsociado);
+    void crear(ProgramacionCreateRequest c);
+    void actualizar(Integer id, ProgramacionUpdateRequest t);
+    void eliminar(ProgramacionDeleteRequest e);
 }

@@ -1,30 +1,47 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolesClinica;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface RolesClinicaDTO {
-    record Request(
-                 String nombreRol,
-                 Boolean estado,
-                 Integer idAsociado
-    ) {}
-    record Response(
-                 Integer idRoles,
-                 String nombreRol,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Boolean estado,
-                 Integer idAsociado,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idRoles,
-                 String nombreRol,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record RolesClinicaCatalogResponse(
+            Integer idRoles,
+            String nombreRol) {
+    }
+
+    record RolesClinicaListResponse(
+            Integer idRoles,
+            String nombreRol,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record RolesClinicaDetailResponse(
+            Integer idRoles,
+            String nombreRol,
+            Boolean estado,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record RolesClinicaCreateRequest(
+            String nombreRol) {
+    }
+
+    record RolesClinicaUpdateRequest(
+            String nombreRol,
+            Boolean estado) {
+    }
+
+    record RolesClinicaFilterRequest(
+            String nombreRol,
+            Boolean estado) {
+    }
+
+    record RolesClinicaDeleteRequest(
+            Integer idRoles) {
+    }
 }

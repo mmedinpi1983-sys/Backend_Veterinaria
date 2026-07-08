@@ -1,12 +1,15 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Anamnesis;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisDTO.AnamnesisUpdateRequest;
+
 public interface AnamnesisService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    List<AnamnesisListResponse> listar();
+    AnamnesisDetailResponse obtenerId(Integer idAnamnesis);
+    void crear(AnamnesisCreateRequest c);
+    void actualizar(Integer idAnamnesis, AnamnesisUpdateRequest mt);
+    void eliminar(AnamnesisDeleteRequest e);
 }

@@ -1,46 +1,62 @@
 package com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota.DuenoMascotaDTO.DuenoMascotaUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class DuenoMascotaServiceImpl implements DuenoMascotaService {
-    private final DuenoMascotaRepository repository;
-    public DuenoMascotaServiceImpl(DuenoMascotaRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdDuenoMascota(), e.getFechaCreacion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        DuenoMascota e = repository.findByIdDuenoMascotaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("DuenoMascota no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final DuenoMascotaRepository r;
+    private final DuenoMascotaMapper m;
+
+    public DuenoMascotaServiceImpl(DuenoMascotaRepository r, DuenoMascotaMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        DuenoMascota e = new DuenoMascota();
-        e.setIdDueno(request.idDueno());
-        e.setIdMascota(request.idMascota());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<DuenoMascotaCatalogResponse> catalogo(Integer idAsociado) {
+        return m.DuenoMascotaCatalogoMapperList(r.catalogo(idAsociado));
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        DuenoMascota e = repository.findByIdDuenoMascotaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("DuenoMascota no encontrado", "NOT_FOUND"));
-        e.setIdDueno(request.idDueno());
-        e.setIdMascota(request.idMascota());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<DuenoMascotaListResponse> listar(Integer idAsociado) {
+        return m.DuenoMascotaListMapperList(r.listar(idAsociado));
     }
-    @Override public void eliminar(Integer id) {
-        DuenoMascota e = repository.findByIdDuenoMascotaAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("DuenoMascota no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+
+    @Override
+    public DuenoMascotaDetailResponse obtenerId(Integer idDuenoMascota, Integer idAsociado) {
+        return m.DuenoMascotaDetailMapper(r.detalle(idDuenoMascota, idAsociado));
     }
-    private Response toResponse(DuenoMascota e) { return new Response(e.getIdDuenoMascota(), e.getIdDueno(), e.getIdMascota(), e.getIdAsociado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(DuenoMascotaCreateRequest c) {
+        DuenoMascota entity = m.toEntity(c);
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idDuenoMascota, DuenoMascotaUpdateRequest u) {
+        DuenoMascota entity = r.getReferenceById(idDuenoMascota);
+        m.updateEntity(entity, u);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(DuenoMascotaDeleteRequest e) {
+        r.eliminar(e.idDuenoMascota(), UsuarioActual.getId(), UsuarioActual.getAsociadoId());
+    }
 }

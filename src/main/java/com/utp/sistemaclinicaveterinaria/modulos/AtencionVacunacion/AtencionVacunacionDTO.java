@@ -1,40 +1,61 @@
 package com.utp.sistemaclinicaveterinaria.modulos.AtencionVacunacion;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface AtencionVacunacionDTO {
-    record Request(
-                 Integer idAtencion,
-                 Integer idVacuna,
-                 Integer dosis,
-                 LocalDate fechaAplicacion,
-                 LocalDate fechaRefuerzo,
-                 String observaciones,
-                 Boolean estado,
-                 Integer idConsulta
-    ) {}
-    record Response(
-                 Integer idVacunacion,
-                 Integer idAtencion,
-                 Integer idVacuna,
-                 Integer dosis,
-                 LocalDate fechaAplicacion,
-                 LocalDate fechaRefuerzo,
-                 String observaciones,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Boolean estado,
-                 Integer idConsulta,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idVacunacion,
-                 String observaciones,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record AtencionVacunacionListResponse(
+            Integer idVacunacion,
+            String observaciones,
+            LocalDateTime fechaCreacion,
+            Boolean estado) {
+    }
+
+    record AtencionVacunacionDetailResponse(
+            Integer idVacunacion,
+            Integer idAtencion,
+            Integer idVacuna,
+            Integer dosis,
+            LocalDate fechaAplicacion,
+            LocalDate fechaRefuerzo,
+            String observaciones,
+            Boolean estado,
+            Integer idConsulta,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record AtencionVacunacionCreateRequest(
+            Integer idAtencion,
+            Integer idVacuna,
+            Integer dosis,
+            LocalDate fechaAplicacion,
+            LocalDate fechaRefuerzo,
+            String observaciones,
+            Boolean estado,
+            Integer idConsulta) {
+    }
+
+    record AtencionVacunacionUpdateRequest(
+            Integer idAtencion,
+            Integer idVacuna,
+            Integer dosis,
+            LocalDate fechaAplicacion,
+            LocalDate fechaRefuerzo,
+            String observaciones,
+            Boolean estado,
+            Integer idConsulta) {
+    }
+
+    record AtencionVacunacionFilterRequest(
+            String observaciones,
+            Boolean estado) {
+    }
+
+    record AtencionVacunacionDeleteRequest(
+            Integer idVacunacion) {
+    }
 }

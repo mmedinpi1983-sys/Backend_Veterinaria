@@ -1,30 +1,47 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Presentacion;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface PresentacionDTO {
-    record Request(
-                 String nombre,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record Response(
-                 Integer idPresentacion,
-                 String nombre,
-                 Integer idAsociado,
-                 Boolean estado,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idPresentacion,
-                 String nombre,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record PresentacionCatalogResponse(
+            Integer idPresentacion,
+            String nombre) {
+    }
+
+    record PresentacionListResponse(
+            Integer idPresentacion,
+            String nombre,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record PresentacionDetailResponse(
+            Integer idPresentacion,
+            String nombre,
+            Boolean estado,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record PresentacionCreateRequest(
+            String nombre) {
+    }
+
+    record PresentacionUpdateRequest(
+            String nombre,
+            Boolean estado) {
+    }
+
+    record PresentacionFilterRequest(
+            String nombre,
+            Boolean estado) {
+    }
+
+    record PresentacionDeleteRequest(
+            Integer idPresentacion) {
+    }
 }

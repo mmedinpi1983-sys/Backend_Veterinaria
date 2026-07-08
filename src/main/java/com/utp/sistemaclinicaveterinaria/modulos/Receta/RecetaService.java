@@ -1,12 +1,17 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Receta;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.ListItem;
-import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.Request;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaUpdateRequest;
+
 public interface RecetaService {
-    List<ListItem> listar();
-    Response obtenerPorId(Integer id);
-    Response crear(Request request);
-    Response actualizar(Integer id, Request request);
-    void eliminar(Integer id);
+    List<RecetaCatalogResponse> catalogo(Integer idAsociado);
+    List<RecetaListResponse> listar();
+    RecetaDetailResponse obtenerId(Integer id, Integer idAsociado);
+    void crear(RecetaCreateRequest c);
+    void actualizar(Integer id, RecetaUpdateRequest t);
+    void eliminar(RecetaDeleteRequest e);
 }

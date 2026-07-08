@@ -1,36 +1,56 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.EstadoSalidaAtencion.EstadoSalidaAtencionDTO.EstadoSalidaAtencionUpdateRequest;
+
 @Service
 public class EstadoSalidaAtencionServiceImpl implements EstadoSalidaAtencionService {
-    private final EstadoSalidaAtencionRepository repository;
-    public EstadoSalidaAtencionServiceImpl(EstadoSalidaAtencionRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findAll().stream().map(e -> new ListItem(e.getIdEstadoSalida(), e.getNombre(), e.getDescripcion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        EstadoSalidaAtencion e = repository.findById(id).orElseThrow(() -> new ApiException("EstadoSalidaAtencion no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final EstadoSalidaAtencionRepository r;
+    private final EstadoSalidaAtencionMapper m;
+
+    public EstadoSalidaAtencionServiceImpl(EstadoSalidaAtencionRepository r, EstadoSalidaAtencionMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        EstadoSalidaAtencion e = new EstadoSalidaAtencion();
-        e.setNombre(request.nombre());
-        e.setDescripcion(request.descripcion());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<EstadoSalidaAtencionCatalogResponse> catalogo() {
+        return m.EstadoSalidaAtencionCatalogoMapperList(r.catalogo());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        EstadoSalidaAtencion e = repository.findById(id).orElseThrow(() -> new ApiException("EstadoSalidaAtencion no encontrado", "NOT_FOUND"));
-        e.setNombre(request.nombre());
-        e.setDescripcion(request.descripcion());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<EstadoSalidaAtencionListResponse> listar(EstadoSalidaAtencionFilterRequest f) {
+        return m.EstadoSalidaAtencionListMapperList(r.listar(f.nombre()));
     }
-    @Override public void eliminar(Integer id) {
-        EstadoSalidaAtencion e = repository.findById(id).orElseThrow(() -> new ApiException("EstadoSalidaAtencion no encontrado", "NOT_FOUND"));
-        repository.delete(e);
+
+    @Override
+    public EstadoSalidaAtencionDetailResponse obtenerId(Integer id) {
+        return m.EstadoSalidaAtencionDetailMapper(r.detalle(id));
     }
-    private Response toResponse(EstadoSalidaAtencion e) { return new Response(e.getIdEstadoSalida(), e.getNombre(), e.getDescripcion()); }
+
+    @Override
+    public void crear(EstadoSalidaAtencionCreateRequest c) {
+        EstadoSalidaAtencion entity = m.toEntity(c);
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer id, EstadoSalidaAtencionUpdateRequest mt) {
+        EstadoSalidaAtencion entity = r.findById(id).orElseThrow(() -> new RuntimeException("EstadoSalidaAtencion no encontrado"));
+        m.updateEntity(entity, mt);
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(EstadoSalidaAtencionDeleteRequest e) {
+        r.eliminar(e.idEstadoSalida());
+    }
 }

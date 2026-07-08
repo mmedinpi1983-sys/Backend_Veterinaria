@@ -1,46 +1,61 @@
 package com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion.NivelSuscripcionDTO.NivelSuscripcionUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class NivelSuscripcionServiceImpl implements NivelSuscripcionService {
-    private final NivelSuscripcionRepository repository;
-    public NivelSuscripcionServiceImpl(NivelSuscripcionRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdNivel(), e.getNombre(), e.getFechaCreacion(), e.getEstado())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        NivelSuscripcion e = repository.findByIdNivelAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("NivelSuscripcion no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final NivelSuscripcionRepository r;
+    private final NivelSuscripcionMapper m;
+
+    public NivelSuscripcionServiceImpl(NivelSuscripcionRepository r, NivelSuscripcionMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        NivelSuscripcion e = new NivelSuscripcion();
-        e.setNombre(request.nombre());
-        e.setCantidadUsuario(request.cantidadUsuario());
-        e.setPrecioMensual(request.precioMensual());
-        e.setPrecioAnual(request.precioAnual());
-        e.setEstado(request.estado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<NivelSuscripcionCatalogResponse> catalogo() {
+        return m.NivelSuscripcionCatalogoMapperList(r.catalogo());
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        NivelSuscripcion e = repository.findByIdNivelAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("NivelSuscripcion no encontrado", "NOT_FOUND"));
-        e.setNombre(request.nombre());
-        e.setCantidadUsuario(request.cantidadUsuario());
-        e.setPrecioMensual(request.precioMensual());
-        e.setPrecioAnual(request.precioAnual());
-        e.setEstado(request.estado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<NivelSuscripcionListResponse> listar() {
+        return m.NivelSuscripcionListMapperList(r.listar());
     }
-    @Override public void eliminar(Integer id) {
-        NivelSuscripcion e = repository.findByIdNivelAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("NivelSuscripcion no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        repository.save(e);
+
+    @Override
+    public NivelSuscripcionDetailResponse obtenerId(Integer id) {
+        return m.NivelSuscripcionDetailMapper(r.detalle(id));
     }
-    private Response toResponse(NivelSuscripcion e) { return new Response(e.getIdNivel(), e.getNombre(), e.getCantidadUsuario(), e.getPrecioMensual(), e.getPrecioAnual(), e.getEstado(), e.getFechaCreacion(), e.getFechaEliminacion(), e.getFechaModificacion(), e.getIdSuperAdminCreador(), e.getIdSuperAdminModificador(), e.getIdSuperAdminEliminador()); }
+
+    @Override
+    public void crear(NivelSuscripcionCreateRequest c) {
+        NivelSuscripcion entity = m.toEntity(c);
+        entity.setFechaCreacion(LocalDateTime.now());
+        entity.setIdSuperAdminCreador(UsuarioActual.getId());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer id, NivelSuscripcionUpdateRequest mt) {
+        NivelSuscripcion entity = r.getReferenceById(id);
+        m.updateEntity(entity, mt);
+        entity.setIdSuperAdminModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(NivelSuscripcionDeleteRequest e) {
+        r.eliminar(e.idNivel(), UsuarioActual.getId());
+    }
 }

@@ -1,42 +1,63 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolPermiso;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class RolPermisoServiceImpl implements RolPermisoService {
-    private final RolPermisoRepository repository;
-    public RolPermisoServiceImpl(RolPermisoRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdRolPermiso(), e.getFechaCreacion())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        RolPermiso e = repository.findByIdRolPermisoAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RolPermiso no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final RolPermisoRepository r;
+    private final RolPermisoMapper m;
+
+    public RolPermisoServiceImpl(RolPermisoRepository r, RolPermisoMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        RolPermiso e = new RolPermiso();
-        e.setIdRolesClinica(request.idRolesClinica());
-        e.setIdPermiso(request.idPermiso());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaCreacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<RolPermisoCatalogResponse> catalogo(Integer idAsociado) {
+        return m.RolPermisoCatalogoMapperList(r.catalogo(idAsociado));
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        RolPermiso e = repository.findByIdRolPermisoAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RolPermiso no encontrado", "NOT_FOUND"));
-        e.setIdRolesClinica(request.idRolesClinica());
-        e.setIdPermiso(request.idPermiso());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaModificacion(LocalDateTime.now());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<RolPermisoListResponse> listar(RolPermisoFilterRequest f) {
+        return m.RolPermisoListMapperList(r.listar(UsuarioActual.getAsociadoId()));
     }
-    @Override public void eliminar(Integer id) {
-        RolPermiso e = repository.findByIdRolPermisoAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("RolPermiso no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        repository.save(e);
+
+    @Override
+    public RolPermisoDetailResponse obtenerId(Integer idRolPermiso, Integer idAsociado) {
+        return m.RolPermisoDetailMapper(r.detalle(idRolPermiso, idAsociado));
     }
-    private Response toResponse(RolPermiso e) { return new Response(e.getIdRolPermiso(), e.getIdRolesClinica(), e.getIdPermiso(), e.getIdAsociado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(RolPermisoCreateRequest c) {
+        RolPermiso entity = m.toEntity(c);
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idRolPermiso, RolPermisoUpdateRequest mt) {
+        RolPermiso entity = r.getReferenceById(idRolPermiso);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(RolPermisoDeleteRequest e) {
+        r.eliminar(e.idRolPermiso(), UsuarioActual.getId(), UsuarioActual.getAsociadoId());
+    }
 }

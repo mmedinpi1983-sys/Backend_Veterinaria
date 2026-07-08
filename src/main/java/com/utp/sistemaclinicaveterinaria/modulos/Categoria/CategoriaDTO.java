@@ -1,30 +1,47 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Categoria;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface CategoriaDTO {
-    record Request(
-                 String nombreCategoria,
-                 Integer idAsociado,
-                 Boolean estado
-    ) {}
-    record Response(
-                 Integer idCategoria,
-                 String nombreCategoria,
-                 Integer idAsociado,
-                 Boolean estado,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idEmpleadoCreador,
-                 Integer idEmpleadoModificador,
-                 Integer idEmpleadoEliminador
-    ) {}
-    record ListItem(
-                 Integer idCategoria,
-                 String nombreCategoria,
-                 LocalDateTime fechaCreacion,
-                 Boolean estado
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record CategoriaCatalogResponse(
+            Integer idCategoria,
+            String nombreCategoria) {
+    }
+
+    record CategoriaListResponse(
+            Integer idCategoria,
+            String nombreCategoria,
+            Boolean estado,
+            LocalDateTime fechaCreacion) {
+    }
+
+    record CategoriaDetailResponse(
+            Integer idCategoria,
+            String nombreCategoria,
+            Boolean estado,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record CategoriaCreateRequest(
+            String nombreCategoria) {
+    }
+
+    record CategoriaUpdateRequest(
+            String nombreCategoria,
+            Boolean estado) {
+    }
+
+    record CategoriaFilterRequest(
+            String nombreCategoria,
+            Boolean estado) {
+    }
+
+    record CategoriaDeleteRequest(
+            Integer idCategoria) {
+    }
 }

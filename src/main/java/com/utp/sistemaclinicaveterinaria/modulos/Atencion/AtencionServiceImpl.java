@@ -1,24 +1,24 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Atencion;
 
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
-
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.Anamnesis;
-import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisRepository;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AtencionUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.AnamnesisInfo;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.ConsultaInfo;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.DetalleCompleto;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.ListItem;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.MedicamentoReceta;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.RecetaInfo;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.Response;
 import com.utp.sistemaclinicaveterinaria.modulos.Atencion.AtencionDTO.TriajeInfo;
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsulta;
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaRepository;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.Anamnesis;
+import com.utp.sistemaclinicaveterinaria.modulos.Anamnesis.AnamnesisRepository;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.Receta;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaRepository;
 import com.utp.sistemaclinicaveterinaria.modulos.RecetaDetalle.RecetaDetalleRepository;
@@ -27,11 +27,13 @@ import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeRepository;
 import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalle;
 import com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle.TriajeDetalleRepository;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
 @Service
 public class AtencionServiceImpl implements AtencionService {
 
-    private final AtencionRepository repository;
+    private final AtencionRepository r;
+    private final AtencionMapper m;
     private final TriajeRepository triajeRepository;
     private final TriajeDetalleRepository triajeDetalleRepository;
     private final AtencionConsultaRepository consultaRepository;
@@ -40,14 +42,16 @@ public class AtencionServiceImpl implements AtencionService {
     private final RecetaDetalleRepository recetaDetalleRepository;
 
     public AtencionServiceImpl(
-            AtencionRepository repository,
+            AtencionRepository r,
+            AtencionMapper m,
             TriajeRepository triajeRepository,
             TriajeDetalleRepository triajeDetalleRepository,
             AtencionConsultaRepository consultaRepository,
             AnamnesisRepository anamnesisRepository,
             RecetaRepository recetaRepository,
             RecetaDetalleRepository recetaDetalleRepository) {
-        this.repository = repository;
+        this.r = r;
+        this.m = m;
         this.triajeRepository = triajeRepository;
         this.triajeDetalleRepository = triajeDetalleRepository;
         this.consultaRepository = consultaRepository;
@@ -57,34 +61,32 @@ public class AtencionServiceImpl implements AtencionService {
     }
 
     @Override
-    public List<ListItem> listar() {
-        return repository.findByFechaEliminacionIsNull().stream()
-                .map(e -> new ListItem(e.getIdAtencion(), e.getObservacion(), e.getFechaCreacion()))
-                .toList();
+    public List<AtencionListResponse> listar() {
+        return m.AtencionListMapperList(r.listar());
     }
 
     @Override
-    public Response obtenerPorId(Integer id) {
-        Atencion e = repository.findByIdAtencionAndFechaEliminacionIsNull(id)
-                .orElseThrow(() -> new ApiException("Atencion no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    public AtencionDetailResponse obtenerId(Integer idAtencion) {
+        return m.AtencionDetailMapper(r.detalle(idAtencion));
     }
 
     @Override
-    public Response obtenerPorCita(Integer idCita) {
-        Atencion e = repository.findByIdCitaProgramadaAndFechaEliminacionIsNull(idCita)
+    public AtencionDetailResponse obtenerPorCita(Integer idCita) {
+        Atencion entity = r.findByIdCitaProgramadaAndFechaEliminacionIsNull(idCita)
                 .orElseThrow(() -> new ApiException("No existe atención para esta cita", "NOT_FOUND"));
-        return toResponse(e);
+        return m.AtencionDetailMapper(r.detalle(entity.getIdAtencion()));
     }
 
     @Override
     public DetalleCompleto obtenerDetalle(Integer id) {
-        Atencion atencion = repository.findByIdAtencionAndFechaEliminacionIsNull(id)
-                .orElseThrow(() -> new ApiException("Atencion no encontrado", "NOT_FOUND"));
+        AtencionDetailResponse atencion = m.AtencionDetailMapper(r.detalle(id));
+
+        Atencion entity = r.findByIdCitaProgramadaAndFechaEliminacionIsNull(
+            r.getReferenceById(id).getIdCitaProgramada()).orElse(null);
 
         TriajeInfo triajeInfo = null;
-        if (atencion.getIdTriaje() != null) {
-            Triaje t = triajeRepository.findByIdTriajeAndFechaEliminacionIsNull(atencion.getIdTriaje()).orElse(null);
+        if (entity != null && entity.getIdTriaje() != null) {
+            Triaje t = triajeRepository.findByIdTriajeAndFechaEliminacionIsNull(entity.getIdTriaje()).orElse(null);
             if (t != null) {
                 TriajeDetalle td = triajeDetalleRepository
                         .findByIdTriajeAndFechaEliminacionIsNull(t.getIdTriaje()).orElse(null);
@@ -102,7 +104,7 @@ public class AtencionServiceImpl implements AtencionService {
         RecetaInfo recetaInfo = null;
 
         AtencionConsulta consulta = consultaRepository
-                .findByIdAtencionAndFechaEliminacionIsNull(atencion.getIdAtencion()).orElse(null);
+                .findByIdAtencionAndFechaEliminacionIsNull(id).orElse(null);
 
         if (consulta != null) {
             consultaInfo = new ConsultaInfo(
@@ -137,67 +139,34 @@ public class AtencionServiceImpl implements AtencionService {
             }
         }
 
-        return new DetalleCompleto(toResponse(atencion), triajeInfo, consultaInfo, anamnesisInfo, recetaInfo);
+        return new DetalleCompleto(atencion, triajeInfo, consultaInfo, anamnesisInfo, recetaInfo);
     }
 
     @Override
-    public Response crear(Request request) {
-        Atencion e = new Atencion();
-        e.setIdCitaProgramada(request.idCitaProgramada());
-        e.setIdTriaje(request.idTriaje());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaAtencion(request.fechaAtencion());
-        e.setHoraInicio(request.horaInicio());
-        e.setHoraFin(request.horaFin());
-        e.setObservacion(request.observacion());
-        e.setIdEstadoSalida(request.idEstadoSalida());
-        e.setIdEstadoAtencion(request.idEstadoAtencion());
-        e.setIdMascota(request.idMascota());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+    public void crear(AtencionCreateRequest c) {
+        Atencion entity = m.toEntity(c);
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        r.save(entity);
     }
 
     @Override
-    public Response actualizar(Integer id, Request request) {
-        Atencion e = repository.findByIdAtencionAndFechaEliminacionIsNull(id)
-                .orElseThrow(() -> new ApiException("Atencion no encontrado", "NOT_FOUND"));
-        e.setIdCitaProgramada(request.idCitaProgramada());
-        e.setIdTriaje(request.idTriaje());
-        e.setIdAsociado(request.idAsociado());
-        e.setFechaAtencion(request.fechaAtencion());
-        e.setHoraInicio(request.horaInicio());
-        e.setHoraFin(request.horaFin());
-        e.setObservacion(request.observacion());
-        e.setIdEstadoSalida(request.idEstadoSalida());
-        e.setIdEstadoAtencion(request.idEstadoAtencion());
-        e.setIdMascota(request.idMascota());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+    public void actualizar(Integer idAtencion, AtencionUpdateRequest mt) {
+        Atencion entity = r.getReferenceById(idAtencion);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
     }
 
     @Override
-    public void eliminar(Integer id) {
-        Atencion e = repository.findByIdAtencionAndFechaEliminacionIsNull(id)
-                .orElseThrow(() -> new ApiException("Atencion no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+    public void eliminar(AtencionDeleteRequest e) {
+        r.eliminar(e.idAtencion(), UsuarioActual.getId());
     }
 
     @Override
     public List<HistorialView> getHistorialByMascota(Integer idMascota) {
-        return repository.findHistorialByIdMascota(idMascota);
-    }
-
-    private Response toResponse(Atencion e) {
-        return new Response(e.getIdAtencion(), e.getIdCitaProgramada(), e.getIdTriaje(), e.getIdAsociado(),
-                e.getFechaAtencion(), e.getHoraInicio(), e.getHoraFin(), e.getObservacion(),
-                e.getIdEstadoSalida(), e.getFechaCreacion(), e.getFechaModificacion(),
-                e.getFechaEliminacion(), e.getIdEstadoAtencion(), e.getIdMascota(),
-                e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador());
+        return r.findHistorialByIdMascota(idMascota);
     }
 }

@@ -1,28 +1,46 @@
 package com.utp.sistemaclinicaveterinaria.modulos.MedicamentoCatalogo;
-import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface MedicamentoCatalogoDTO {
-    record Request(
-                 String codigoMedicamento,
-                 String nombreMedicamento,
-                 String descripcion,
-                 String concentracion,
-                 String presentacion
-    ) {}
-    record Response(
-                 Integer idMedicamento,
-                 String codigoMedicamento,
-                 String nombreMedicamento,
-                 String descripcion,
-                 String concentracion,
-                 String presentacion
-    ) {}
-    record ListItem(
-                 Integer idMedicamento,
-                 String codigoMedicamento,
-                 String nombreMedicamento,
-                 String descripcion
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record MedicamentoCatalogoCatalogResponse(
+            Integer idMedicamento,
+            String codigoMedicamento,
+            String nombreMedicamento) {
+    }
+
+    record MedicamentoCatalogoListResponse(
+            Integer idMedicamento,
+            String codigoMedicamento,
+            String nombreMedicamento,
+            String descripcion) {
+    }
+
+    record MedicamentoCatalogoDetailResponse(
+            Integer idMedicamento,
+            String codigoMedicamento,
+            String nombreMedicamento,
+            String descripcion,
+            String concentracion,
+            String presentacion) {
+    }
+
+    record MedicamentoCatalogoCreateRequest(
+            String codigoMedicamento,
+            String nombreMedicamento,
+            String descripcion,
+            String concentracion,
+            String presentacion) {
+    }
+
+    record MedicamentoCatalogoUpdateRequest(
+            String codigoMedicamento,
+            String nombreMedicamento,
+            String descripcion,
+            String concentracion,
+            String presentacion) {
+    }
+
+    record MedicamentoCatalogoDeleteRequest(
+            Integer idMedicamento) {
+    }
 }

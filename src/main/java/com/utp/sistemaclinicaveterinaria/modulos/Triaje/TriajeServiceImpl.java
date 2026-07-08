@@ -1,54 +1,64 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Triaje;
+
 import org.springframework.stereotype.Service;
-import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
-import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.Response;
-import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.Request;
-import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.ListItem;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeCatalogResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeDeleteRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeListResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
+
 @Service
 public class TriajeServiceImpl implements TriajeService {
-    private final TriajeRepository repository;
-    public TriajeServiceImpl(TriajeRepository repository) { this.repository = repository; }
-    @Override public List<ListItem> listar() { return repository.findByFechaEliminacionIsNull().stream().map(e -> new ListItem(e.getIdTriaje(), e.getCodigoTemporal(), e.getFechaCreacion(), e.getEstado())).toList(); }
-    @Override public Response obtenerPorId(Integer id) {
-        Triaje e = repository.findByIdTriajeAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Triaje no encontrado", "NOT_FOUND"));
-        return toResponse(e);
+    private final TriajeRepository r;
+    private final TriajeMapper m;
+
+    public TriajeServiceImpl(TriajeRepository r, TriajeMapper m) {
+        this.r = r;
+        this.m = m;
     }
-    @Override public Response crear(Request request) {
-        Triaje e = new Triaje();
-        e.setIdCitaProgramada(request.idCitaProgramada());
-        e.setCodigoTemporal(request.codigoTemporal());
-        e.setIdMascota(request.idMascota());
-        e.setPrioridad(request.prioridad());
-        e.setEstado(request.estado());
-        e.setIdAsociado(request.idAsociado());
-        e.setIdMetodoIngreso(request.idMetodoIngreso());
-        e.setFechaCreacion(LocalDateTime.now());
-        e.setIdEmpleadoCreador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<TriajeCatalogResponse> catalogo(Integer idAsociado) {
+        return m.TriajeCatalogoMapperList(r.catalogo(idAsociado));
     }
-    @Override public Response actualizar(Integer id, Request request) {
-        Triaje e = repository.findByIdTriajeAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Triaje no encontrado", "NOT_FOUND"));
-        e.setIdCitaProgramada(request.idCitaProgramada());
-        e.setCodigoTemporal(request.codigoTemporal());
-        e.setIdMascota(request.idMascota());
-        e.setPrioridad(request.prioridad());
-        e.setEstado(request.estado());
-        e.setIdAsociado(request.idAsociado());
-        e.setIdMetodoIngreso(request.idMetodoIngreso());
-        e.setFechaModificacion(LocalDateTime.now());
-        e.setIdEmpleadoModificador(UsuarioActual.getId());
-        e = repository.save(e);
-        return toResponse(e);
+
+    @Override
+    public List<TriajeListResponse> listar(TriajeFilterRequest f) {
+        return m.TriajeListMapperList(r.listar(UsuarioActual.getAsociadoId()));
     }
-    @Override public void eliminar(Integer id) {
-        Triaje e = repository.findByIdTriajeAndFechaEliminacionIsNull(id).orElseThrow(() -> new ApiException("Triaje no encontrado", "NOT_FOUND"));
-        e.setFechaEliminacion(LocalDateTime.now());
-        e.setIdEmpleadoEliminador(UsuarioActual.getId());
-        repository.save(e);
+
+    @Override
+    public TriajeDetailResponse obtenerId(Integer idTriaje, Integer idAsociado) {
+        return m.TriajeDetailMapper(r.detalle(idTriaje, idAsociado));
     }
-    private Response toResponse(Triaje e) { return new Response(e.getIdTriaje(), e.getIdCitaProgramada(), e.getCodigoTemporal(), e.getIdMascota(), e.getPrioridad(), e.getEstado(), e.getFechaCreacion(), e.getFechaModificacion(), e.getFechaEliminacion(), e.getIdAsociado(), e.getIdMetodoIngreso(), e.getIdEmpleadoCreador(), e.getIdEmpleadoModificador(), e.getIdEmpleadoEliminador()); }
+
+    @Override
+    public void crear(TriajeCreateRequest c) {
+        Triaje entity = m.toEntity(c);
+        entity.setEstado(true);
+        entity.setIdAsociado(UsuarioActual.getAsociadoId());
+        entity.setIdEmpleadoCreador(UsuarioActual.getId());
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void actualizar(Integer idTriaje, TriajeUpdateRequest mt) {
+        Triaje entity = r.getReferenceById(idTriaje);
+        m.updateEntity(entity, mt);
+        entity.setIdEmpleadoModificador(UsuarioActual.getId());
+        entity.setFechaModificacion(LocalDateTime.now());
+        r.save(entity);
+    }
+
+    @Override
+    public void eliminar(TriajeDeleteRequest e) {
+        r.eliminar(e.idTriaje(), UsuarioActual.getId(), UsuarioActual.getAsociadoId());
+    }
 }

@@ -1,46 +1,69 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Asociado;
 import java.time.*;
-import java.math.BigDecimal;
-import java.util.List;
+
 public interface AsociadoDTO {
-    record Request(
-                 String nombre,
-                 String ruc,
-                 String nombreDueno,
-                 String apellidoDueno,
-                 Integer idNivelSuscripcion,
-                 Boolean activo,
-                 String correoElectronico,
-                 String nroTelefono,
-                 String direccion,
-                 String diasAtencion
-    ) {}
-    record Response(
-                 Integer idAsociado,
-                 String nombre,
-                 String ruc,
-                 String nombreDueno,
-                 String apellidoDueno,
-                 Integer idNivelSuscripcion,
-                 Boolean activo,
-                 String correoElectronico,
-                 String nroTelefono,
-                 String direccion,
-                 String diasAtencion,
-                 LocalDateTime fechaCreacion,
-                 LocalDateTime fechaModificacion,
-                 LocalDateTime fechaEliminacion,
-                 Integer idSuperAdminCreador,
-                 Integer idSuperAdminModificador,
-                 Integer idSuperAdminEliminador
-    ) {}
-    record ListItem(
-                 Integer idAsociado,
-                 String nombre,
-                 String ruc,
-                 String nombreDueno,
-                 LocalDateTime fechaCreacion,
-                 Boolean activo
-    ) {}
-    record ListResponse(List<ListItem> items) {}
+
+    record AsociadoListResponse(
+            Integer idAsociado,
+            String nombre,
+            String ruc,
+            String nombreDueno,
+            LocalDateTime fechaCreacion,
+            Boolean activo) {
+    }
+
+    record AsociadoDetailResponse(
+            Integer idAsociado,
+            String nombre,
+            String ruc,
+            String nombreDueno,
+            String apellidoDueno,
+            Integer idNivelSuscripcion,
+            Boolean activo,
+            String correoElectronico,
+            String nroTelefono,
+            String direccion,
+            String diasAtencion,
+            String usuarioCreador,
+            LocalDateTime fechaCreacion,
+            String usuarioModificador,
+            LocalDateTime fechaModificacion,
+            String usuarioEliminador,
+            LocalDateTime fechaEliminacion) {
+    }
+
+    record AsociadoCreateRequest(
+            String nombre,
+            String ruc,
+            String nombreDueno,
+            String apellidoDueno,
+            Integer idNivelSuscripcion,
+            Boolean activo,
+            String correoElectronico,
+            String nroTelefono,
+            String direccion,
+            String diasAtencion) {
+    }
+
+    record AsociadoUpdateRequest(
+            String nombre,
+            String ruc,
+            String nombreDueno,
+            String apellidoDueno,
+            Integer idNivelSuscripcion,
+            Boolean activo,
+            String correoElectronico,
+            String nroTelefono,
+            String direccion,
+            String diasAtencion) {
+    }
+
+    record AsociadoFilterRequest(
+            String nombre,
+            Boolean activo) {
+    }
+
+    record AsociadoDeleteRequest(
+            Integer idAsociado) {
+    }
 }

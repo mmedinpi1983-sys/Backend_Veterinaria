@@ -3,17 +3,67 @@ package com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.Projection.CitaProgramadaDetalleProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.Projection.CitaProgramadaListarProjection;
+
 public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, Integer> {
 
-    List<CitaProgramada> findByFechaEliminacionIsNull();
+    @Query(value = """
+            SELECT
+            cp.idCitaProgramada,
+            cp.motivo,
+            cp.motivoReprogramacion,
+            cp.fechaCreacion
+            FROM CitaProgramada AS cp
+            WHERE cp.fechaEliminacion IS NULL
+            ORDER BY cp.fechaCreacion DESC
+            """, nativeQuery = true)
+    List<CitaProgramadaListarProjection> listar();
+
+    @Query(value = """
+            SELECT
+            cp.idCitaProgramada,
+            cp.id_Dueno AS idDueno,
+            cp.id_Programacion AS idProgramacion,
+            cp.id_Mascota AS idMascota,
+            cp.fecha,
+            cp.horaInicio,
+            cp.horaFin,
+            cp.id_EstadoCita AS idEstadoCita,
+            cp.motivo,
+            cp.id_Categoria AS idCategoria,
+            cp.id_Servicio AS idServicio,
+            cp.motivoReprogramacion,
+            CONCAT(TRIM(eac.apellidoPaterno),' ', TRIM(eac.apellidoMaterno), ' ', TRIM(eac.nombreEmpleado)) AS empleadoCreador,
+            cp.fechaCreacion,
+            CONCAT(TRIM(eam.apellidoPaterno),' ', TRIM(eam.apellidoMaterno), ' ', TRIM(eam.nombreEmpleado)) AS empleadoModificador,
+            cp.fechaModificacion,
+            CONCAT(TRIM(eae.apellidoPaterno),' ', TRIM(eae.apellidoMaterno), ' ', TRIM(eae.nombreEmpleado)) AS empleadoEliminador,
+            cp.fechaEliminacion
+            FROM CitaProgramada AS cp
+            LEFT JOIN EmpleadoAsociado AS eac ON cp.id_EmpleadoCreador = eac.idEmpleadoAsociado
+            LEFT JOIN EmpleadoAsociado AS eam ON cp.id_EmpleadoModificador = eam.idEmpleadoAsociado
+            LEFT JOIN EmpleadoAsociado AS eae ON cp.id_EmpleadoEliminador = eae.idEmpleadoAsociado
+            WHERE cp.idCitaProgramada = :idCitaProgramada
+            """, nativeQuery = true)
+    CitaProgramadaDetalleProjection detalle(@Param("idCitaProgramada") Integer idCitaProgramada);
 
     Optional<CitaProgramada> findByIdCitaProgramadaAndFechaEliminacionIsNull(Integer idCitaProgramada);
+
+    @Query(value = """
+            UPDATE CitaProgramada
+            SET
+            fechaEliminacion = GETDATE(),
+            id_EmpleadoEliminador = :idUsuario
+            WHERE idCitaProgramada = :idCitaProgramada
+            """, nativeQuery = true)
+    void eliminar(
+            @Param("idCitaProgramada") Integer idCitaProgramada,
+            @Param("idUsuario") Integer idUsuario);
 
     @Query(value = """
         SELECT
@@ -84,8 +134,6 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
         """, nativeQuery = true)
     List<CitaListView> findCitasByMascota(@Param("idMascota") Integer idMascota);
 
-    // Veterinarios disponibles para agendar: uno por veterinario+turno, con su programación
-    // (para enlazar la cita) y el horario del turno (para filtrar las horas en el modal).
     @Query(value = """
         SELECT
             MIN(p.idProgramacion) AS idProgramacion,
@@ -102,8 +150,6 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
         """, nativeQuery = true)
     List<VeterinarioView> findVeterinariosDisponibles();
 
-    // Horas (HH:mm) ya ocupadas por citas NO canceladas de esa programación (veterinario) en una fecha.
-    // excluirId permite ignorar una cita concreta (al reprogramar, para no chocar con su propio horario).
     @Query(value = """
         SELECT CONVERT(varchar(5), c.horaInicio, 108)
         FROM CitaProgramada c

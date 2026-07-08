@@ -16,6 +16,6 @@ public class AuthController {
     // POST /api/auth/login - valida credenciales y retorna datos del empleado
     @PostMapping("/login")
     public ApiResponse<AuthDTO.LoginResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
-        return ApiResponse.ResponseAn("login", service.login(request));
+        return ApiResponse.ResponseAn(service.login(request));
     }
 }
