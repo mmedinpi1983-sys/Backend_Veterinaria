@@ -40,13 +40,13 @@ public class MascotaServiceImpl implements MascotaService {
     }
 
     @Override
-    public void crear(MascotaCreateRequest c) {
+    public Integer crear(MascotaCreateRequest c) {
         Mascota entity = m.toEntity(c);
         entity.setEstado(true);
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setFechaCreacion(LocalDateTime.now());
-        r.save(entity);
+        return r.save(entity).getIdMascota();
     }
 
     @Override

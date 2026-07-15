@@ -1,8 +1,11 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolesClinica;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -51,6 +54,8 @@ public interface RolesClinicaRepository extends JpaRepository<RolesClinica, Inte
             """, nativeQuery = true)
     RolesClinicaDetalleProjection detalle(@Param("idRoles") Integer idRoles, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE RolesClinica
             SET

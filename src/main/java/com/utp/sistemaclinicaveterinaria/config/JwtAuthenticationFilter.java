@@ -33,8 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Integer idEmpleado = claims.get("idEmpleado", Integer.class);
                 Integer idAsociado = claims.get("idAsociado", Integer.class);
                 String nombreCompleto = claims.get("nombreCompleto", String.class);
+                Integer idRolesClinica = claims.get("idRolesClinica", Integer.class);
 
-                UserPrincipal principal = new UserPrincipal(idEmpleado, idAsociado, nombreCompleto);
+                UserPrincipal principal = new UserPrincipal(idEmpleado, idAsociado, nombreCompleto, idRolesClinica);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null,
                         Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(auth);

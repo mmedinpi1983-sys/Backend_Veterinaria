@@ -1,8 +1,11 @@
 package com.utp.sistemaclinicaveterinaria.modulos.RolPermiso;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -52,6 +55,19 @@ public interface RolPermisoRepository extends JpaRepository<RolPermiso, Integer>
             """, nativeQuery = true)
     RolPermisoDetalleProjection detalle(@Param("idRolPermiso") Integer idRolPermiso, @Param("idAsociado") Integer idAsociado);
 
+    @Query(value = """
+            SELECT p.nombrePermiso
+            FROM Rol_Permiso rp
+            JOIN Permiso p ON p.idPermiso = rp.id_Permiso
+            WHERE rp.id_RolesClinica = :idRolesClinica
+              AND rp.id_Asociado = :idAsociado
+              AND rp.fechaEliminacion IS NULL
+              AND p.estado = 1
+            """, nativeQuery = true)
+    List<String> nombrePermisosDeRol(@Param("idRolesClinica") Integer idRolesClinica, @Param("idAsociado") Integer idAsociado);
+
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Rol_Permiso
             SET

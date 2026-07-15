@@ -9,19 +9,31 @@ import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPer
 import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.RolPermiso.RolPermisoDTO.RolPermisoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.common.PermisoAccessService;
 import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rolpermiso")
 public class RolPermisoController {
     private final RolPermisoService service;
+    private final PermisoAccessService permisoAccessService;
 
-    public RolPermisoController(RolPermisoService service) {
+    public RolPermisoController(RolPermisoService service, PermisoAccessService permisoAccessService) {
         this.service = service;
+        this.permisoAccessService = permisoAccessService;
+    }
+
+    // Módulos a los que tiene acceso el rol del usuario logueado (usado por el frontend
+    // para mostrar/ocultar el sidebar y bloquear rutas).
+    @GetMapping("/mismodulos")
+    public ApiResponse<Map<String, Object>> misModulos() {
+        var acceso = permisoAccessService.resolver(UsuarioActual.getIdRolesClinica(), UsuarioActual.getAsociadoId());
+        return ApiResponse.ResponseAn(Map.of("superAdmin", acceso.superAdmin(), "modulos", acceso.modulos()));
     }
 
     @GetMapping("/catalogo")

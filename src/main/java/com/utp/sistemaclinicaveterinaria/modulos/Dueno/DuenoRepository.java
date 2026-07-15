@@ -1,8 +1,11 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Dueno;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -71,6 +74,8 @@ public interface DuenoRepository extends JpaRepository<Dueno, Integer> {
             """, nativeQuery = true)
     DuenoDetalleProjection detalle(@Param("idDueno") Integer idDueno, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Dueno
             SET estado = 0, id_EmpleadoEliminador = :idUsuario, fechaEliminacion = GETDATE()

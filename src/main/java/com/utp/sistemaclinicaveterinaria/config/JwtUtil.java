@@ -24,12 +24,13 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String generateToken(Integer idEmpleado, Integer idAsociado, String nombreCompleto) {
+    public String generateToken(Integer idEmpleado, Integer idAsociado, String nombreCompleto, Integer idRolesClinica) {
         Date now = new Date();
         return Jwts.builder()
                 .claim("idEmpleado", idEmpleado)
                 .claim("idAsociado", idAsociado)
                 .claim("nombreCompleto", nombreCompleto)
+                .claim("idRolesClinica", idRolesClinica)
                 .subject(idEmpleado.toString())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiration))

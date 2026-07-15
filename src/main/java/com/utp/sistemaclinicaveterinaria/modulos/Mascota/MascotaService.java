@@ -12,7 +12,7 @@ public interface MascotaService {
     List<MascotaCatalogResponse> catalogo(Integer idAsociado);
     List<MascotaListResponse> listar(MascotaFilterRequest f);
     MascotaDetailResponse obtenerId(Integer idMascota, Integer idAsociado);
-    void crear(MascotaCreateRequest c);
+    Integer crear(MascotaCreateRequest c);
     void actualizar(Integer idMascota, MascotaUpdateRequest u);
     void eliminar(MascotaDeleteRequest e);
     List<SearchItem> buscar(String q);

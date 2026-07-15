@@ -26,6 +26,14 @@ public final class UsuarioActual {
         return 1;
     }
 
+    public static Integer getIdRolesClinica() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof UserPrincipal up) {
+            return up.idRolesClinica();
+        }
+        return null;
+    }
+
     public static String getNombreCompleto() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof UserPrincipal up) {

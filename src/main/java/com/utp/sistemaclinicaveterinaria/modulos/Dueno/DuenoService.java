@@ -11,7 +11,7 @@ public interface DuenoService {
     List<DuenoCatalogResponse> catalogo(Integer idAsociado);
     List<DuenoListResponse> listar(DuenoFilterRequest f);
     DuenoDetailResponse obtenerId(Integer idDueno, Integer idAsociado);
-    void crear(DuenoCreateRequest c);
+    Integer crear(DuenoCreateRequest c);
     void actualizar(Integer idDueno, DuenoUpdateRequest u);
     void eliminar(DuenoDeleteRequest e);
 }

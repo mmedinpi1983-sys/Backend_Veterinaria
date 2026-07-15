@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.utp.sistemaclinicaveterinaria.config.JwtUtil;
 import com.utp.sistemaclinicaveterinaria.modulos.Auth.AuthDTO.LoginRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Auth.AuthDTO.LoginResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.EmpleadoAsociado.EmpleadoAsociado;
 import com.utp.sistemaclinicaveterinaria.modulos.EmpleadoAsociado.EmpleadoAsociadoRepository;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 
@@ -24,28 +25,35 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Busca un empleado activo que coincida con el correo y contraseña ingresados
+    // Busca un empleado que coincida con el correo y contraseña ingresados, y valida que esté activo
     @Override
     public LoginResponse login(LoginRequest request) {
-        return empleadoRepo.findByFechaEliminacionIsNull().stream()
-                .filter(e -> e.getCorreo().equalsIgnoreCase(request.correo())
-                        && passwordEncoder.matches(request.contrasena(), e.getContrasena())
-                        && Boolean.TRUE.equals(e.getEstado()))
+        EmpleadoAsociado empleado = empleadoRepo.findByFechaEliminacionIsNull().stream()
+                .filter(e -> e.getCorreo().equalsIgnoreCase(request.correo()))
                 .findFirst()
-                .map(e -> {
-                    String nombreCompleto = e.getNombreEmpleado() + " " + e.getApellidoPaterno();
-                    String token = jwtUtil.generateToken(
-                            e.getIdEmpleadoAsociado(),
-                            e.getIdAsociado(),
-                            nombreCompleto);
-                    return new AuthDTO.LoginResponse(
-                            e.getIdEmpleadoAsociado(),
-                            e.getNombreEmpleado(),
-                            e.getApellidoPaterno(),
-                            e.getCorreo(),
-                            e.getIdRolesClinica(),
-                            e.getIdAsociado(),
-                            token);
-                }).orElseThrow(() -> new ApiException("Credenciales incorrectas", "UNAUTHORIZED"));
+                .orElseThrow(() -> new ApiException("Credenciales incorrectas", "UNAUTHORIZED"));
+
+        if (!passwordEncoder.matches(request.contrasena(), empleado.getContrasena())) {
+            throw new ApiException("Credenciales incorrectas", "UNAUTHORIZED");
+        }
+
+        if (!Boolean.TRUE.equals(empleado.getEstado())) {
+            throw new ApiException("Cuenta inactiva", "ACCOUNT_INACTIVE");
+        }
+
+        String nombreCompleto = empleado.getNombreEmpleado() + " " + empleado.getApellidoPaterno();
+        String token = jwtUtil.generateToken(
+                empleado.getIdEmpleadoAsociado(),
+                empleado.getIdAsociado(),
+                nombreCompleto,
+                empleado.getIdRolesClinica());
+        return new AuthDTO.LoginResponse(
+                empleado.getIdEmpleadoAsociado(),
+                empleado.getNombreEmpleado(),
+                empleado.getApellidoPaterno(),
+                empleado.getCorreo(),
+                empleado.getIdRolesClinica(),
+                empleado.getIdAsociado(),
+                token);
     }
 }

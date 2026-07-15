@@ -81,4 +81,8 @@ public interface DuenoDTO {
     record DuenoDeleteRequest(
             Integer idDueno) {
     }
+
+    record DuenoCreateResponse(
+            Integer idDueno) {
+    }
 }

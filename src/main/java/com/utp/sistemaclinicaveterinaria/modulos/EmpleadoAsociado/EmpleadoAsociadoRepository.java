@@ -1,8 +1,11 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EmpleadoAsociado;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +39,11 @@ public interface EmpleadoAsociadoRepository extends JpaRepository<EmpleadoAsocia
             apellidoPaterno,
             apellidoMaterno,
             nroDocumento,
+            id_RolesClinica AS idRolesClinica,
             estado,
             fechaCreacion
             FROM EmpleadoAsociado
-            WHERE id_Asociado = :idAsociado AND estado = :estado
+            WHERE id_Asociado = :idAsociado AND fechaEliminacion IS NULL AND (:estado IS NULL OR estado = :estado)
             AND (nombreEmpleado LIKE CONCAT('%',:q,'%') OR apellidoPaterno LIKE CONCAT('%',:q,'%') OR nroDocumento LIKE CONCAT('%',:q,'%'))
             """, nativeQuery = true)
     List<EmpleadoAsociadoListarProjection> listar(
@@ -76,6 +80,8 @@ public interface EmpleadoAsociadoRepository extends JpaRepository<EmpleadoAsocia
             """, nativeQuery = true)
     EmpleadoAsociadoDetalleProjection detalle(@Param("idEmpleadoAsociado") Integer idEmpleadoAsociado, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE EmpleadoAsociado
             SET estado = 0, id_EmpleadoEliminador = :idUsuario, fechaEliminacion = GETDATE()

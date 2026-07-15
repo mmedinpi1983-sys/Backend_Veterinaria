@@ -20,7 +20,7 @@ public interface RazaRepository extends JpaRepository<EspecieRaza, Integer> {
                         nombre,
                         id_Especie
                         FROM EspecieRaza
-                        WHERE id_Asociado = :idAsociado AND
+                        WHERE (id_Asociado IS NULL OR id_Asociado = :idAsociado) AND
                         id_Especie IS NOT NULL AND
                         estado = 1
                         ORDER BY nombre ASC
@@ -40,7 +40,7 @@ public interface RazaRepository extends JpaRepository<EspecieRaza, Integer> {
                         WHERE
                         (:nombre IS NULL OR raza.nombre LIKE CONCAT('%', :nombre, '%')) AND
                         (:estado IS NULL OR raza.estado = :estado) AND
-                        raza.id_Asociado = :idAsociado
+                        (raza.id_Asociado IS NULL OR raza.id_Asociado = :idAsociado)
                         ORDER BY raza.nombre ASC
                         """, nativeQuery = true)
         List<Object[]> listar(

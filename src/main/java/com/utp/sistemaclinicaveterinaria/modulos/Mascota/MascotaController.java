@@ -51,9 +51,9 @@ public class MascotaController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody MascotaCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<MascotaDTO.MascotaCreateResponse> crear(@Valid @RequestBody MascotaCreateRequest c) {
+        Integer idMascota = service.crear(c);
+        return ApiResponse.ResponseAn(new MascotaDTO.MascotaCreateResponse(idMascota));
     }
 
     @PutMapping("/{id}")

@@ -75,6 +75,10 @@ public interface MascotaDTO {
             Integer idMascota) {
     }
 
+    record MascotaCreateResponse(
+            Integer idMascota) {
+    }
+
     record SearchItem(
             Integer idMascota,
             String nombre,

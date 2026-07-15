@@ -44,9 +44,9 @@ public class DuenoController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody DuenoCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<DuenoDTO.DuenoCreateResponse> crear(@Valid @RequestBody DuenoCreateRequest c) {
+        Integer idDueno = service.crear(c);
+        return ApiResponse.ResponseAn(new DuenoDTO.DuenoCreateResponse(idDueno));
     }
 
     @PutMapping("/{id}")

@@ -1,8 +1,11 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Mascota;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -65,6 +68,8 @@ public interface MascotaRepository extends JpaRepository<Mascota, Integer> {
             """, nativeQuery = true)
     MascotaDetalleProjection detalle(@Param("idMascota") Integer idMascota, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Mascota
             SET estado = 0, id_EmpleadoEliminador = :idUsuario, fechaEliminacion = GETDATE()

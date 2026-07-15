@@ -40,7 +40,7 @@ public class DuenoServiceImpl implements DuenoService {
     }
 
     @Override
-    public void crear(DuenoCreateRequest c) {
+    public Integer crear(DuenoCreateRequest c) {
         if (r.existsByNroDocumentoAndFechaEliminacionIsNull(c.nroDocumento())) {
             throw new ApiException("Ya existe un dueño registrado con ese DNI", "DUPLICATE");
         }
@@ -49,7 +49,7 @@ public class DuenoServiceImpl implements DuenoService {
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setFechaCreacion(LocalDateTime.now());
-        r.save(entity);
+        return r.save(entity).getIdDueno();
     }
 
     @Override

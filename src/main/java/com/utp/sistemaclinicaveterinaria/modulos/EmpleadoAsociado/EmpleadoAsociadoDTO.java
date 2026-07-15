@@ -18,6 +18,7 @@ public interface EmpleadoAsociadoDTO {
             String apellidoPaterno,
             String apellidoMaterno,
             String nroDocumento,
+            Integer idRolesClinica,
             Boolean estado,
             LocalDateTime fechaCreacion) {
     }

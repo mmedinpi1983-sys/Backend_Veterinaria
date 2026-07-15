@@ -9,6 +9,7 @@ public interface EmpleadoAsociadoListarProjection {
     String getApellidoPaterno();
     String getApellidoMaterno();
     String getNroDocumento();
+    Integer getIdRolesClinica();
     Boolean getEstado();
     LocalDateTime getFechaCreacion();
 }

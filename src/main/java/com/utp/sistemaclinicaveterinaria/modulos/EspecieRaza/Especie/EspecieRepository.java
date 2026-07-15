@@ -22,7 +22,7 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         WHERE
                         estado = 1 AND
                         id_Especie IS NULL AND
-                        id_Asociado = :idAsociado
+                        (id_Asociado IS NULL OR id_Asociado = :idAsociado)
                         ORDER BY nombre
                         """, nativeQuery = true)
         List<Object[]> catalogo(@Param("idAsociado") Integer idAsociado);
@@ -38,7 +38,7 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         WHERE
                         (:nombre IS NULL OR nombre LIKE CONCAT('%', :nombre, '%')) AND
                         (:estado IS NULL OR estado = :estado) AND
-                        id_Asociado = :idAsociado;
+                        (id_Asociado IS NULL OR id_Asociado = :idAsociado);
                         """, nativeQuery = true)
         List<Object[]> listar(
                         @Param("nombre") String nombre,
