@@ -12,3 +12,6 @@ bin/
 
 application.properties
 
+
+# Logs generados en tiempo de ejecucion
+logs/
