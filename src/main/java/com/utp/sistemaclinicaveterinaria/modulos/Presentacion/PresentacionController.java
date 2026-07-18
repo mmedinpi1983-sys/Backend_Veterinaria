@@ -32,7 +32,7 @@ public class PresentacionController {
 
     @GetMapping
     public ApiResponse<List<PresentacionListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombre) {
         var data = service.listar(new PresentacionDTO.PresentacionFilterRequest(nombre, estado));
         return ApiResponse.ResponseList(data, data.size());

@@ -51,9 +51,9 @@ public class AtencionController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody AtencionCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<AtencionDTO.AtencionCreateResponse> crear(@Valid @RequestBody AtencionCreateRequest c) {
+        Integer idAtencion = service.crear(c);
+        return ApiResponse.ResponseAn(new AtencionDTO.AtencionCreateResponse(idAtencion));
     }
 
     @PutMapping("/{id}")

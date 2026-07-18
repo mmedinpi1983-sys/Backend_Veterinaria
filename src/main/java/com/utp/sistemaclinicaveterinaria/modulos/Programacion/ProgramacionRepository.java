@@ -1,8 +1,10 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Programacion;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,11 +22,29 @@ public interface ProgramacionRepository extends JpaRepository<Programacion, Inte
     List<ProgramacionCatalogoProjection> catalogo(@Param("idAsociado") Integer idAsociado);
 
     @Query(value = """
-            SELECT idProgramacion, ambiente, descripcion, fechaCreacion
-            FROM Programacion
-            WHERE fechaEliminacion IS NULL AND id_Asociado = :idAsociado
+            SELECT
+              p.idProgramacion AS idProgramacion,
+              p.fecha AS fecha,
+              ISNULL(ea.nombreEmpleado,'') + ' ' + ISNULL(ea.apellidoPaterno,'') AS nombreVeterinario,
+              t.nombre AS nombreTurno,
+              CONVERT(varchar(5), t.horaInicio, 108) AS horaInicio,
+              CONVERT(varchar(5), t.horaFin, 108) AS horaFin,
+              ep.nombre AS nombreEstadoProgramacion,
+              p.ambiente AS ambiente,
+              p.descripcion AS descripcion,
+              p.fechaCreacion AS fechaCreacion
+            FROM Programacion p
+            LEFT JOIN EmpleadoAsociado ea ON p.id_EmpleadoRegistrador = ea.idEmpleadoAsociado
+            LEFT JOIN Turno t ON p.id_Turno = t.idTurno
+            LEFT JOIN EstadoProgramacion ep ON p.id_EstadoProgramacion = ep.idEstadoProgramacion
+            WHERE p.fechaEliminacion IS NULL AND p.id_Asociado = :idAsociado
+              AND (:fecha = '' OR CAST(p.fecha AS DATE) = CAST(:fecha AS DATE))
+              AND (:idEmpleadoRegistrador = 0 OR p.id_EmpleadoRegistrador = :idEmpleadoRegistrador)
+            ORDER BY p.fecha DESC, t.horaInicio
             """, nativeQuery = true)
-    List<ProgramacionListarProjection> listar(@Param("idAsociado") Integer idAsociado);
+    List<ProgramacionListarProjection> listar(@Param("idAsociado") Integer idAsociado,
+                                               @Param("fecha") String fecha,
+                                               @Param("idEmpleadoRegistrador") Integer idEmpleadoRegistrador);
 
     @Query(value = """
             SELECT p.idProgramacion, p.fecha, p.id_Turno AS idTurno, p.id_EmpleadoRegistrador AS idEmpleadoRegistrador,
@@ -44,6 +64,8 @@ public interface ProgramacionRepository extends JpaRepository<Programacion, Inte
             """, nativeQuery = true)
     ProgramacionDetalleProjection detalle(@Param("id") Integer id, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Programacion
             SET fechaEliminacion = GETDATE(), id_EmpleadoEliminador = :idUsuario

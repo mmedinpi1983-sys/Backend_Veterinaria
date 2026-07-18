@@ -3,7 +3,12 @@ import java.time.*;
 
 public interface ProgramacionDTO {
     record ProgramacionCatalogResponse(Integer idProgramacion, String ambiente, String descripcion) {}
-    record ProgramacionListResponse(Integer idProgramacion, String ambiente, String descripcion, LocalDateTime fechaCreacion) {}
+    record ProgramacionListResponse(
+            Integer idProgramacion, LocalDate fecha,
+            String nombreVeterinario, String nombreTurno, String horaInicio, String horaFin,
+            String nombreEstadoProgramacion,
+            String ambiente, String descripcion, LocalDateTime fechaCreacion) {}
+    record ProgramacionFilterRequest(String fecha, Integer idEmpleadoRegistrador) {}
     record ProgramacionDetailResponse(
             Integer idProgramacion, LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
             Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,

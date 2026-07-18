@@ -55,14 +55,14 @@ public interface ReporteRepository extends JpaRepository<Venta, Integer> {
     List<CitaSemanaProjection> citasSemana();
 
     @Query(value = """
-            SELECT COALESCE(cat.nombreCategoria, CASE WHEN vd.id_Servicio IS NOT NULL THEN 'Servicios' ELSE 'Otros' END) AS categoria,
+            SELECT COALESCE(cat.nombre, CASE WHEN vd.id_Servicio IS NOT NULL THEN 'Servicios' ELSE 'Otros' END) AS categoria,
                    SUM(vd.subtotal) AS total
             FROM VentaDetalle vd
             JOIN Venta v ON vd.id_Venta=v.idVenta AND ISNULL(v.estadoVenta,1)=1 AND v.fechaEliminacion IS NULL
             LEFT JOIN Producto p ON vd.id_Producto=p.idProducto
-            LEFT JOIN Categoria cat ON p.id_Categoria=cat.idCategoria
+            LEFT JOIN CategoriaProducto cat ON p.id_Categoria=cat.idCategoriaProducto
             WHERE vd.fechaEliminacion IS NULL
-            GROUP BY COALESCE(cat.nombreCategoria, CASE WHEN vd.id_Servicio IS NOT NULL THEN 'Servicios' ELSE 'Otros' END)
+            GROUP BY COALESCE(cat.nombre, CASE WHEN vd.id_Servicio IS NOT NULL THEN 'Servicios' ELSE 'Otros' END)
             ORDER BY total DESC
             """, nativeQuery = true)
     List<IngresoCategoriaProjection> ingresosCategoria();

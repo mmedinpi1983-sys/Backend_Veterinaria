@@ -6,6 +6,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.Pr
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionCreateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionFilterRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
@@ -31,8 +32,10 @@ public class ProgramacionController {
     }
 
     @GetMapping
-    public ApiResponse<List<ProgramacionListResponse>> listar() {
-        var data = service.listar();
+    public ApiResponse<List<ProgramacionListResponse>> listar(
+            @RequestParam(required = false, defaultValue = "") String fecha,
+            @RequestParam(required = false, defaultValue = "0") Integer idEmpleadoRegistrador) {
+        var data = service.listar(new ProgramacionFilterRequest(fecha, idEmpleadoRegistrador));
         return ApiResponse.ResponseList(data, data.size());
     }
 

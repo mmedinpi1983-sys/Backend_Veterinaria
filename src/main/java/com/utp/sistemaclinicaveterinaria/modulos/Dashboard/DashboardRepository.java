@@ -59,11 +59,11 @@ public interface DashboardRepository extends JpaRepository<Venta, Integer> {
     @Query(value = """
             SELECT
               p.nombre          AS nombre,
-              c.nombreCategoria AS categoria,
+              c.nombre          AS categoria,
               p.cantidadIngreso AS stock,
               p.cantidadMinima  AS minimo
             FROM Producto p
-            LEFT JOIN Categoria c ON p.id_Categoria = c.idCategoria
+            LEFT JOIN CategoriaProducto c ON p.id_Categoria = c.idCategoriaProducto
             WHERE p.estado = 1 AND p.cantidadIngreso <= p.cantidadMinima
             ORDER BY p.cantidadIngreso ASC
             """, nativeQuery = true)

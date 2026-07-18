@@ -12,7 +12,7 @@ public interface AtencionService {
     AtencionDetailResponse obtenerId(Integer idAtencion);
     AtencionDetailResponse obtenerPorCita(Integer idCita);
     DetalleCompleto obtenerDetalle(Integer id);
-    void crear(AtencionCreateRequest c);
+    Integer crear(AtencionCreateRequest c);
     void actualizar(Integer idAtencion, AtencionUpdateRequest mt);
     void eliminar(AtencionDeleteRequest e);
     List<HistorialView> getHistorialByMascota(Integer idMascota);

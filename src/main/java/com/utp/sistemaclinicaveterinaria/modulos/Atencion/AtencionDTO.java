@@ -41,6 +41,10 @@ public interface AtencionDTO {
             Integer idMascota) {
     }
 
+    record AtencionCreateResponse(
+            Integer idAtencion) {
+    }
+
     record AtencionUpdateRequest(
             Integer idCitaProgramada,
             Integer idTriaje,

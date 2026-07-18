@@ -32,7 +32,7 @@ public class ServicioController {
 
     @GetMapping
     public ApiResponse<List<ServicioListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombre) {
         var data = service.listar(new ServicioDTO.ServicioFilterRequest(nombre, estado));
         return ApiResponse.ResponseList(data, data.size());

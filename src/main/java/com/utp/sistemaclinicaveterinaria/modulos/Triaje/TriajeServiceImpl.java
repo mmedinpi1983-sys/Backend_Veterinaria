@@ -39,13 +39,13 @@ public class TriajeServiceImpl implements TriajeService {
     }
 
     @Override
-    public void crear(TriajeCreateRequest c) {
+    public Integer crear(TriajeCreateRequest c) {
         Triaje entity = m.toEntity(c);
         entity.setEstado(true);
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setFechaCreacion(LocalDateTime.now());
-        r.save(entity);
+        return r.save(entity).getIdTriaje();
     }
 
     @Override

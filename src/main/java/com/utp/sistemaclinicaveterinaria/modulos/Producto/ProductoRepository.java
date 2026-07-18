@@ -19,7 +19,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
             SELECT
               p.idProducto      AS idProducto,
               p.nombre          AS nombre,
-              c.nombreCategoria AS categoria,
+              c.nombre          AS categoria,
               p.id_Categoria    AS idCategoria,
               p.cantidadIngreso AS stock,
               p.cantidadMinima  AS cantidadMinima,
@@ -28,7 +28,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
               p.fechaVencimiento AS fechaVencimiento,
               p.estado          AS estado
             FROM Producto p
-            LEFT JOIN Categoria c ON p.id_Categoria = c.idCategoria
+            LEFT JOIN CategoriaProducto c ON p.id_Categoria = c.idCategoriaProducto
             LEFT JOIN EmpleadoAsociado ea ON p.id_EmpleadoAsociado = ea.idEmpleadoAsociado
             WHERE p.fechaEliminacion IS NULL AND ea.id_Asociado = :idAsociado
               AND (:q = '' OR p.nombre LIKE CONCAT('%', :q, '%'))
@@ -55,12 +55,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     @Query(value = """
             SELECT
               p.idProducto AS idProducto, p.nombre AS nombre, p.id_Categoria AS idCategoria,
-              c.nombreCategoria AS categoria, p.cantidadIngreso AS stock, p.cantidadMinima AS cantidadMinima,
+              c.nombre AS categoria, p.cantidadIngreso AS stock, p.cantidadMinima AS cantidadMinima,
               p.precioVenta AS precioVenta, p.precioCompra AS precioCompra, p.proveedor AS proveedor,
               p.fechaVencimiento AS fechaVencimiento, p.concentracion AS concentracion,
               p.notas AS notas, p.estado AS estado
             FROM Producto p
-            LEFT JOIN Categoria c ON p.id_Categoria = c.idCategoria
+            LEFT JOIN CategoriaProducto c ON p.id_Categoria = c.idCategoriaProducto
             WHERE p.idProducto = :id
             """, nativeQuery = true)
     ProductoDetalleProjection detalle(@Param("id") Integer id);
@@ -80,10 +80,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     ProductoStatsProjection stats(@Param("idAsociado") Integer idAsociado);
 
     @Query(value = """
-            SELECT idCategoria AS idCategoria, nombreCategoria AS nombreCategoria
-            FROM Categoria
+            SELECT idCategoriaProducto AS idCategoria, nombre AS nombreCategoria
+            FROM CategoriaProducto
             WHERE estado = 1 AND id_Asociado = :idAsociado
-            ORDER BY nombreCategoria
+            ORDER BY nombre
             """, nativeQuery = true)
     List<CategoriaProjection> categorias(@Param("idAsociado") Integer idAsociado);
 

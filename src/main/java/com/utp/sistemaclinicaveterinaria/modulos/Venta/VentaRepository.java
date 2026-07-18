@@ -88,9 +88,10 @@ public interface VentaRepository extends JpaRepository<Venta, Integer> {
             p.idProducto     AS idProducto,
             p.nombre         AS nombre,
             p.precioVenta    AS precioVenta,
-            c.nombreCategoria AS categoria
+            p.cantidadIngreso AS stock,
+            c.nombre         AS categoria
             FROM Producto p
-            LEFT JOIN Categoria c ON p.id_Categoria = c.idCategoria
+            LEFT JOIN CategoriaProducto c ON p.id_Categoria = c.idCategoriaProducto
             LEFT JOIN EmpleadoAsociado ea ON p.id_EmpleadoAsociado = ea.idEmpleadoAsociado
             WHERE p.estado = 1 AND ea.id_Asociado = :idAsociado
             ORDER BY p.nombre
@@ -119,7 +120,7 @@ public interface VentaRepository extends JpaRepository<Venta, Integer> {
             SET estadoVenta = 0,
                 id_EmpleadoEliminador = :idUsuario,
                 fechaEliminacion = GETDATE()
-            WHERE idVenta = :idVenta
+            WHERE idVenta = :idVenta AND ISNULL(estadoVenta, 1) = 1
             """, nativeQuery = true)
     void anular(@Param("idVenta") Integer idVenta, @Param("idUsuario") Integer idUsuario);
 }

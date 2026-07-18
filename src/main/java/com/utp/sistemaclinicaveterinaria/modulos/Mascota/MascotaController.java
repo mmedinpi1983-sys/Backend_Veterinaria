@@ -33,7 +33,7 @@ public class MascotaController {
 
     @GetMapping
     public ApiResponse<List<MascotaListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String q) {
         var data = service.listar(new MascotaDTO.MascotaFilterRequest(q, estado));
         return ApiResponse.ResponseList(data, data.size());

@@ -11,6 +11,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.Pr
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionCreateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionFilterRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Programacion.ProgramacionDTO.ProgramacionUpdateRequest;
 
@@ -30,8 +31,10 @@ public class ProgramacionServiceImpl implements ProgramacionService {
     }
 
     @Override
-    public List<ProgramacionListResponse> listar() {
-        return m.toListResponseList(r.listar(UsuarioActual.getAsociadoId()));
+    public List<ProgramacionListResponse> listar(ProgramacionFilterRequest f) {
+        String fecha = f == null || f.fecha() == null ? "" : f.fecha().trim();
+        Integer idEmpleadoRegistrador = f == null || f.idEmpleadoRegistrador() == null ? 0 : f.idEmpleadoRegistrador();
+        return m.toListResponseList(r.listar(UsuarioActual.getAsociadoId(), fecha, idEmpleadoRegistrador));
     }
 
     @Override

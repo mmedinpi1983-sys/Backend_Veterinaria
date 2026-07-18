@@ -9,7 +9,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsul
 public interface AtencionConsultaService {
     List<AtencionConsultaListResponse> listar();
     AtencionConsultaDetailResponse obtenerId(Integer idConsulta);
-    void crear(AtencionConsultaCreateRequest c);
+    Integer crear(AtencionConsultaCreateRequest c);
     void actualizar(Integer idConsulta, AtencionConsultaUpdateRequest mt);
     void eliminar(AtencionConsultaDeleteRequest e);
 }

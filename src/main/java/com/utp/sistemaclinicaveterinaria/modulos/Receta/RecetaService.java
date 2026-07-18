@@ -11,7 +11,7 @@ public interface RecetaService {
     List<RecetaCatalogResponse> catalogo(Integer idAsociado);
     List<RecetaListResponse> listar();
     RecetaDetailResponse obtenerId(Integer id, Integer idAsociado);
-    void crear(RecetaCreateRequest c);
+    Integer crear(RecetaCreateRequest c);
     void actualizar(Integer id, RecetaUpdateRequest t);
     void eliminar(RecetaDeleteRequest e);
 }

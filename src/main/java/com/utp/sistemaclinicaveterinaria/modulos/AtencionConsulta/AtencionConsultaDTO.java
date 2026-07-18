@@ -40,6 +40,10 @@ public interface AtencionConsultaDTO {
             String motivoConsulta) {
     }
 
+    record AtencionConsultaCreateResponse(
+            Integer idConsulta) {
+    }
+
     record AtencionConsultaUpdateRequest(
             Integer idAtencion,
             String evaluacionClinica,

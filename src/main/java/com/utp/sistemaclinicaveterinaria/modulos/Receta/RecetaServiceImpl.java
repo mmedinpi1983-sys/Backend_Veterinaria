@@ -40,12 +40,12 @@ public class RecetaServiceImpl implements RecetaService {
     }
 
     @Override
-    public void crear(RecetaCreateRequest c) {
+    public Integer crear(RecetaCreateRequest c) {
         Receta entity = m.toEntity(c);
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setFechaCreacion(LocalDateTime.now());
-        r.save(entity);
+        return r.save(entity).getIdReceta();
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaCatalogResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaCreateResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaDetailResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Receta.RecetaDTO.RecetaListResponse;
@@ -42,9 +43,9 @@ public class RecetaController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody RecetaCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<RecetaCreateResponse> crear(@Valid @RequestBody RecetaCreateRequest c) {
+        Integer idReceta = service.crear(c);
+        return ApiResponse.ResponseAn(new RecetaCreateResponse(idReceta));
     }
 
     @PutMapping("/{id}")

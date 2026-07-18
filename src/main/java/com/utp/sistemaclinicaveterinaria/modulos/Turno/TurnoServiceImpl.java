@@ -41,9 +41,11 @@ public class TurnoServiceImpl implements TurnoService {
     @Override
     public void crear(TurnoCreateRequest c) {
         Turno entity = m.toEntity(c);
+        entity.setEstado(true);
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
-        entity = r.save(entity);
+        entity.setFechaCreacion(LocalDateTime.now());
+        r.save(entity);
     }
 
     @Override

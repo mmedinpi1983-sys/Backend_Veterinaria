@@ -32,7 +32,7 @@ public class CategoriaController {
 
     @GetMapping
     public ApiResponse<List<CategoriaListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombreCategoria) {
         var data = service.listar(new CategoriaDTO.CategoriaFilterRequest(nombreCategoria, estado));
         return ApiResponse.ResponseList(data, data.size());

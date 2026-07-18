@@ -41,6 +41,10 @@ public interface TriajeDTO {
             Integer idMetodoIngreso) {
     }
 
+    record TriajeCreateResponse(
+            Integer idTriaje) {
+    }
+
     record TriajeUpdateRequest(
             Integer idCitaProgramada,
             String codigoTemporal,

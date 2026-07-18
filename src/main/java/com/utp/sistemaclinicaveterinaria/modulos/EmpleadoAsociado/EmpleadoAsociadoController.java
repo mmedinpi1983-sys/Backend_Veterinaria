@@ -32,6 +32,9 @@ public class EmpleadoAsociadoController {
 
     @GetMapping
     public ApiResponse<List<EmpleadoAsociadoListResponse>> listar(
+            // A diferencia de Mascota/Dueno/Categoria/Servicio: la tabla de Usuarios en Configuración
+            // muestra activos e inactivos juntos con un toggle inline para reactivar, así que este
+            // endpoint no debe filtrar por defecto (ver configuracion.html, toggleEstadoUsuario).
             @RequestParam(required = false) Boolean estado,
             @RequestParam(required = false, defaultValue = "") String q) {
         var data = service.listar(new EmpleadoAsociadoDTO.EmpleadoAsociadoFilterRequest(q, estado));
