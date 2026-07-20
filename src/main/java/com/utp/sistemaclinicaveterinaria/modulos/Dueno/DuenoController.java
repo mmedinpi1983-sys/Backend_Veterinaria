@@ -32,7 +32,7 @@ public class DuenoController {
 
     @GetMapping
     public ApiResponse<List<DuenoListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String q) {
         var data = service.listar(new DuenoDTO.DuenoFilterRequest(q, estado));
         return ApiResponse.ResponseList(data, data.size());
