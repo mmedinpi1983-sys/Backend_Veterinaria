@@ -79,7 +79,8 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
             ISNULL(ea.nombreEmpleado,'') + ' ' + ISNULL(ea.apellidoPaterno,'') AS nombreVeterinario,
             ec.nombre AS estadoCita,
             c.id_EstadoCita AS idEstadoCita,
-            c.motivo
+            c.motivo,
+            at.idAtencion AS idAtencion
         FROM CitaProgramada c
         LEFT JOIN Mascota m ON c.id_Mascota = m.idMascota
         LEFT JOIN EspecieRaza er_esp ON m.id_Especie = er_esp.idEspecieRaza
@@ -89,6 +90,7 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
         LEFT JOIN Programacion p ON c.id_Programacion = p.idProgramacion
         LEFT JOIN EmpleadoAsociado ea ON p.id_EmpleadoRegistrador = ea.idEmpleadoAsociado
         LEFT JOIN EstadoCita ec ON c.id_EstadoCita = ec.idEstadoCita
+        LEFT JOIN Atencion at ON at.id_CitaProgramada = c.idCitaProgramada AND at.fechaEliminacion IS NULL
         WHERE c.fechaEliminacion IS NULL
         AND (:idEstado IS NULL OR c.id_EstadoCita = :idEstado)
         AND (:idEmpleado IS NULL OR p.id_EmpleadoRegistrador = :idEmpleado)
@@ -119,7 +121,8 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
             ISNULL(ea.nombreEmpleado,'') + ' ' + ISNULL(ea.apellidoPaterno,'') AS nombreVeterinario,
             ec.nombre AS estadoCita,
             c.id_EstadoCita AS idEstadoCita,
-            c.motivo
+            c.motivo,
+            at.idAtencion AS idAtencion
         FROM CitaProgramada c
         LEFT JOIN Mascota m ON c.id_Mascota = m.idMascota
         LEFT JOIN EspecieRaza er_esp ON m.id_Especie = er_esp.idEspecieRaza
@@ -129,6 +132,7 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
         LEFT JOIN Programacion p ON c.id_Programacion = p.idProgramacion
         LEFT JOIN EmpleadoAsociado ea ON p.id_EmpleadoRegistrador = ea.idEmpleadoAsociado
         LEFT JOIN EstadoCita ec ON c.id_EstadoCita = ec.idEstadoCita
+        LEFT JOIN Atencion at ON at.id_CitaProgramada = c.idCitaProgramada AND at.fechaEliminacion IS NULL
         WHERE c.fechaEliminacion IS NULL AND c.id_Mascota = :idMascota
         ORDER BY c.fecha DESC, c.horaInicio ASC
         """, nativeQuery = true)

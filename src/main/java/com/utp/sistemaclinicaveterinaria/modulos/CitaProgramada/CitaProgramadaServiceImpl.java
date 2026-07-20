@@ -43,7 +43,7 @@ public class CitaProgramadaServiceImpl implements CitaProgramadaService {
                 v.getIdCitaProgramada(), v.getFecha(), v.getHoraInicio(), v.getHoraFin(),
                 v.getNombreMascota(), v.getEspecie(), v.getRaza(), v.getNombreDueno(),
                 v.getNombreServicio(), v.getNombreVeterinario(), v.getEstadoCita(),
-                v.getIdEstadoCita(), v.getMotivo()
+                v.getIdEstadoCita(), v.getMotivo(), v.getIdAtencion()
             )).toList();
     }
 
@@ -107,7 +107,7 @@ public class CitaProgramadaServiceImpl implements CitaProgramadaService {
             v.getIdCitaProgramada(), v.getFecha(), v.getHoraInicio(), v.getHoraFin(),
             v.getNombreMascota(), v.getEspecie(), v.getRaza(), v.getNombreDueno(),
             v.getNombreServicio(), v.getNombreVeterinario(), v.getEstadoCita(),
-            v.getIdEstadoCita(), v.getMotivo())).toList();
+            v.getIdEstadoCita(), v.getMotivo(), v.getIdAtencion())).toList();
     }
 
     @Override

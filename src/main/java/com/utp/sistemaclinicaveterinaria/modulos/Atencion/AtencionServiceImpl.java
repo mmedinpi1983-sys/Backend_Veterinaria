@@ -91,7 +91,8 @@ public class AtencionServiceImpl implements AtencionService {
                 TriajeDetalle td = triajeDetalleRepository
                         .findByIdTriajeAndFechaEliminacionIsNull(t.getIdTriaje()).orElse(null);
                 triajeInfo = new TriajeInfo(
-                        t.getIdTriaje(), t.getCodigoTemporal(), t.getPrioridad(), t.getIdMetodoIngreso(),
+                        t.getIdTriaje(), td != null ? td.getIdTriajeDetalle() : null,
+                        t.getCodigoTemporal(), t.getPrioridad(), t.getIdMetodoIngreso(),
                         td != null ? td.getTemperatura() : null,
                         td != null ? td.getPeso() : null,
                         td != null ? td.getAlergias() : null,
@@ -133,7 +134,7 @@ public class AtencionServiceImpl implements AtencionService {
                         .stream().map(rd -> new MedicamentoReceta(
                                 rd.getIdRecetaDetalle(), rd.getIdMedicamento(),
                                 rd.getDosis(), rd.getFrecuencia(), rd.getDuracion(),
-                                rd.getIndicacionesEspecificas()))
+                                rd.getViaAdministracion(), rd.getIndicacionesEspecificas()))
                         .toList();
                 recetaInfo = new RecetaInfo(receta.getIdReceta(), receta.getFechaReceta(), detalle);
             }

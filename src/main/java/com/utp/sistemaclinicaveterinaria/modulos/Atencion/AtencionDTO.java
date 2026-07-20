@@ -66,7 +66,7 @@ public interface AtencionDTO {
     }
 
     record TriajeInfo(
-        Integer idTriaje, String codigoTemporal, Integer prioridad, Integer idMetodoIngreso,
+        Integer idTriaje, Integer idTriajeDetalle, String codigoTemporal, Integer prioridad, Integer idMetodoIngreso,
         java.math.BigDecimal temperatura, java.math.BigDecimal peso, String alergias, String observaciones
     ) {}
 
@@ -85,7 +85,7 @@ public interface AtencionDTO {
 
     record MedicamentoReceta(
         Integer idRecetaDetalle, Integer idMedicamento,
-        String dosis, String frecuencia, String duracion, String indicacionesEspecificas
+        String dosis, String frecuencia, String duracion, Integer viaAdministracion, String indicacionesEspecificas
     ) {}
 
     record RecetaInfo(

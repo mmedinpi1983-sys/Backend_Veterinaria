@@ -17,4 +17,5 @@ public interface CitaListView {
     String getEstadoCita();
     Integer getIdEstadoCita();
     String getMotivo();
+    Integer getIdAtencion();
 }

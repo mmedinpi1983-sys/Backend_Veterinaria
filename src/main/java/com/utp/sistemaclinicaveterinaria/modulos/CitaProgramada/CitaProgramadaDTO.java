@@ -88,7 +88,8 @@ public interface CitaProgramadaDTO {
         String nombreVeterinario,
         String estadoCita,
         Integer idEstadoCita,
-        String motivo
+        String motivo,
+        Integer idAtencion
     ) {}
 
     record StatsResponse(
