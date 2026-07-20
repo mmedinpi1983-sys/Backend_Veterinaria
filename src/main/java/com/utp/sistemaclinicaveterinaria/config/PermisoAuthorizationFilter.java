@@ -37,7 +37,10 @@ public class PermisoAuthorizationFilter extends OncePerRequestFilter {
         MODULOS_GATEADOS.put("/api/duenomascota", "pacientes");
 
         MODULOS_GATEADOS.put("/api/citaprogramada", "citas");
-        MODULOS_GATEADOS.put("/api/programacion", "citas");
+
+        MODULOS_GATEADOS.put("/api/programacion", "programacion");
+        MODULOS_GATEADOS.put("/api/turno", "programacion");
+        MODULOS_GATEADOS.put("/api/estadoprogramacion", "programacion");
 
         MODULOS_GATEADOS.put("/api/atencionconsulta", "atencion clinica");
         MODULOS_GATEADOS.put("/api/atencionestetica", "atencion clinica");
@@ -98,6 +101,11 @@ public class PermisoAuthorizationFilter extends OncePerRequestFilter {
         // El topbar (visible en cualquier página) necesita poder mostrar el nombre del rol de
         // cualquier empleado logueado, sin importar si tiene acceso a Configuración o no.
         if (path.equals("/api/rolesclinica/catalogo") && "GET".equalsIgnoreCase(method)) {
+            return null;
+        }
+        // Programación necesita listar empleados para el selector de veterinario, aunque el rol
+        // no tenga acceso a Configuración (igual criterio que rolesclinica/catalogo arriba).
+        if (path.equals("/api/empleadoasociado/catalogo") && "GET".equalsIgnoreCase(method)) {
             return null;
         }
         for (String prefijo : CATALOGOS_LECTURA_LIBRE) {

@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,9 @@ import com.utp.sistemaclinicaveterinaria.modulos.Venta.VentaDTO.VentaListRespons
 import com.utp.sistemaclinicaveterinaria.modulos.Venta.Projection.VentaDetalleProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.VentaDetalle.VentaDetalle;
 import com.utp.sistemaclinicaveterinaria.modulos.VentaDetalle.VentaDetalleRepository;
+import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.MovimientoProducto;
+import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.MovimientoProductoRepository;
+import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.StockActualProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
@@ -36,11 +41,13 @@ public class VentaServiceImpl implements VentaService {
     private final VentaRepository r;
     private final VentaDetalleRepository rd;
     private final VentaMapper m;
+    private final MovimientoProductoRepository mr;
 
-    public VentaServiceImpl(VentaRepository r, VentaDetalleRepository rd, VentaMapper m) {
+    public VentaServiceImpl(VentaRepository r, VentaDetalleRepository rd, VentaMapper m, MovimientoProductoRepository mr) {
         this.r = r;
         this.rd = rd;
         this.m = m;
+        this.mr = mr;
     }
 
     @Override
@@ -143,6 +150,11 @@ public class VentaServiceImpl implements VentaService {
         }
         rd.saveAll(detalles);
 
+        // Salida de stock: descuenta cada producto vendido. Si falta stock o el producto ya no
+        // existe, se corta la venta entera (misma transacción que el save de arriba).
+        ajustarStock(detalles, mr.idClaseSalida(), mr.idMotivoVenta(), -1, idUsuario, ahora,
+                "Uno de los productos de la venta ya no existe", "Stock insuficiente para completar la venta");
+
         log.info("Venta registrada: {} (total S/{}) por empleado {}", guardada.getCodigoVenta(), total, idUsuario);
         return guardada.getIdVenta();
     }
@@ -150,8 +162,75 @@ public class VentaServiceImpl implements VentaService {
     @Override
     @Transactional
     public void anular(VentaDeleteRequest d) {
-        r.anular(d.idVenta(), UsuarioActual.getId());
-        log.info("Venta anulada: id={} por empleado {}", d.idVenta(), UsuarioActual.getId());
+        Venta venta = r.findById(d.idVenta())
+                .orElseThrow(() -> new ApiException("La venta no existe", "NOT_FOUND"));
+        if (venta.getEstadoVenta() != null && venta.getEstadoVenta() == 0) {
+            throw new ApiException("La venta ya fue anulada", "VALIDATION_ERROR");
+        }
+
+        Integer idUsuario = UsuarioActual.getId();
+        List<VentaDetalle> detalles = rd.findByIdVenta(d.idVenta());
+
+        // Entrada de stock: devuelve cada producto de la venta anulada. Si alguno ya no existe
+        // se ignora esa línea (no se puede restaurar stock de un producto eliminado), en vez de
+        // abortar la anulación completa.
+        ajustarStock(detalles, mr.idClaseEntrada(), mr.idMotivoDevolucion(), +1, idUsuario, LocalDateTime.now(), null, null);
+
+        r.anular(d.idVenta(), idUsuario);
+        log.info("Venta anulada: id={} por empleado {}", d.idVenta(), idUsuario);
+    }
+
+    // Ajusta el stock de cada producto de la venta (salida al vender, entrada al anular) y deja
+    // el rastro de auditoría en MovimientoProducto. Compartido entre crear() y anular() para no
+    // duplicar la lectura de stock / armado del movimiento con el signo invertido en cada uno.
+    // mensajeSinProducto/mensajeStockInsuficiente en null = modo tolerante (anular): una línea
+    // cuyo producto ya no existe se ignora en vez de abortar toda la operación.
+    private void ajustarStock(List<VentaDetalle> detalles, Integer idClaseMovimiento, Integer idMotivoMovimiento,
+                               int signo, Integer idUsuario, LocalDateTime fecha,
+                               String mensajeSinProducto, String mensajeStockInsuficiente) {
+        List<Integer> idsProducto = detalles.stream()
+                .map(VentaDetalle::getIdProducto)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .toList();
+        if (idsProducto.isEmpty()) return;
+
+        Map<Integer, Integer> stockPorProducto = new HashMap<>();
+        for (StockActualProjection p : mr.stockActualEnLote(idsProducto)) {
+            stockPorProducto.put(p.getIdProducto(), p.getStock());
+        }
+
+        List<MovimientoProducto> movimientos = new ArrayList<>();
+        for (VentaDetalle det : detalles) {
+            if (det.getIdProducto() == null) continue;
+            Integer stockAnterior = stockPorProducto.get(det.getIdProducto());
+            if (stockAnterior == null) {
+                if (mensajeSinProducto != null) {
+                    throw new ApiException(mensajeSinProducto, "NOT_FOUND");
+                }
+                continue;
+            }
+            int stockNuevo = stockAnterior + signo * det.getCantidad();
+            if (signo < 0 && stockNuevo < 0) {
+                throw new ApiException(mensajeStockInsuficiente, "VALIDATION_ERROR");
+            }
+            MovimientoProducto mov = new MovimientoProducto();
+            mov.setIdProducto(det.getIdProducto());
+            mov.setIdClaseMovimiento(idClaseMovimiento);
+            mov.setCantidad(det.getCantidad());
+            mov.setStockAnterior(stockAnterior);
+            mov.setStockNuevo(stockNuevo);
+            mov.setIdMotivoMovimiento(idMotivoMovimiento);
+            mov.setIdAsociado(UsuarioActual.getAsociadoId());
+            mov.setFechaCreacion(fecha);
+            mov.setIdEmpleadoCreador(idUsuario);
+            movimientos.add(mov);
+            mr.actualizarStock(det.getIdProducto(), stockNuevo, idUsuario);
+            // Si el mismo producto aparece dos veces en la venta, la segunda línea debe partir
+            // del stock ya descontado por la primera, no del valor leído en el lote inicial.
+            stockPorProducto.put(det.getIdProducto(), stockNuevo);
+        }
+        mr.saveAll(movimientos);
     }
 
     private String generarCodigo(String tipo) {

@@ -32,7 +32,7 @@ public class PermisoController {
 
     @GetMapping
     public ApiResponse<List<PermisoListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombrePermiso,
             @RequestParam(required = false, defaultValue = "") String descripcionPermiso) {
         var data = service.listar(new PermisoDTO.PermisoFilterRequest(nombrePermiso, descripcionPermiso, estado));

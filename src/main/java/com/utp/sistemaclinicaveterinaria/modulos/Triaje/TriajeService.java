@@ -12,7 +12,7 @@ public interface TriajeService {
     List<TriajeCatalogResponse> catalogo(Integer idAsociado);
     List<TriajeListResponse> listar(TriajeFilterRequest f);
     TriajeDetailResponse obtenerId(Integer idTriaje, Integer idAsociado);
-    void crear(TriajeCreateRequest c);
+    Integer crear(TriajeCreateRequest c);
     void actualizar(Integer idTriaje, TriajeUpdateRequest mt);
     void eliminar(TriajeDeleteRequest e);
 }

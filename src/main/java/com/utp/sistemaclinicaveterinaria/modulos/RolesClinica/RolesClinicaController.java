@@ -32,7 +32,7 @@ public class RolesClinicaController {
 
     @GetMapping
     public ApiResponse<List<RolesClinicaListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombreRol) {
         var data = service.listar(new RolesClinicaDTO.RolesClinicaFilterRequest(nombreRol, estado));
         return ApiResponse.ResponseList(data, data.size());

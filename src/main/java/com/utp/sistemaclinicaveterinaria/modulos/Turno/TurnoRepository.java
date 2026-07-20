@@ -1,8 +1,10 @@
 package com.utp.sistemaclinicaveterinaria.modulos.Turno;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.Projection.TurnoCatalogoProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.Projection.TurnoDetalleProjection;
@@ -73,6 +75,8 @@ public interface TurnoRepository extends JpaRepository<Turno, Integer> {
                         @Param("idAsociado") Integer idAsociado);
 
         // eliminar
+        @Modifying
+        @Transactional
         @Query(value = """
                         UPDATE Turno
                         SET
@@ -81,7 +85,7 @@ public interface TurnoRepository extends JpaRepository<Turno, Integer> {
                         fechaModificacion = GETDATE()
                         WHERE idTurno = :idTurno and id_Asociado = :idAsociado
                                     """, nativeQuery = true)
-        Object[] eliminar(
+        void eliminar(
                         @Param("idTurno") Integer idTurno,
                         @Param("idUsuarioEliminador") Integer idUsuarioEliminador,
                         @Param("idAsociado") Integer idAsociado);

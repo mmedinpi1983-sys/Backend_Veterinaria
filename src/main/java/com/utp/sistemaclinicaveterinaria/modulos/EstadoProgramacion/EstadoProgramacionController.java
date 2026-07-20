@@ -33,7 +33,7 @@ public class EstadoProgramacionController {
 
     @GetMapping
     public ApiResponse<List<EstadoProgramacionListResponse>> listar(
-            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "true") Boolean estado,
             @RequestParam(required = false, defaultValue = "") String nombre) {
         var data = service.listar(new EstadoProgramacionFilterRequest(nombre, estado));
         return ApiResponse.ResponseList(data, data.size());

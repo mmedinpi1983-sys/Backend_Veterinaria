@@ -32,11 +32,11 @@ public class AtencionConsultaServiceImpl implements AtencionConsultaService {
     }
 
     @Override
-    public void crear(AtencionConsultaCreateRequest c) {
+    public Integer crear(AtencionConsultaCreateRequest c) {
         AtencionConsulta entity = m.toEntity(c);
         entity.setFechaCreacion(LocalDateTime.now());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
-        r.save(entity);
+        return r.save(entity).getIdConsulta();
     }
 
     @Override

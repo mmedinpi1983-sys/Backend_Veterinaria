@@ -6,5 +6,6 @@ public interface ProductoCatalogoProjection {
     Integer getIdProducto();
     String getNombre();
     BigDecimal getPrecioVenta();
+    Integer getStock();
     String getCategoria();
 }

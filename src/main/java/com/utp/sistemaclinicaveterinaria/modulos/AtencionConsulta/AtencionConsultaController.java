@@ -3,6 +3,7 @@ package com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta;
 import org.springframework.web.bind.annotation.*;
 
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaDTO.AtencionConsultaCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaDTO.AtencionConsultaCreateResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaDTO.AtencionConsultaDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaDTO.AtencionConsultaDetailResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.AtencionConsulta.AtencionConsultaDTO.AtencionConsultaListResponse;
@@ -34,9 +35,9 @@ public class AtencionConsultaController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody AtencionConsultaCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<AtencionConsultaCreateResponse> crear(@Valid @RequestBody AtencionConsultaCreateRequest c) {
+        Integer idConsulta = service.crear(c);
+        return ApiResponse.ResponseAn(new AtencionConsultaCreateResponse(idConsulta));
     }
 
     @PutMapping("/{id}")

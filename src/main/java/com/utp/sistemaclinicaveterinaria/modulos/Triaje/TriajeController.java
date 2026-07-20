@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeCatalogResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeCreateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeCreateResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeDetailResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Triaje.TriajeDTO.TriajeListResponse;
@@ -42,9 +43,9 @@ public class TriajeController {
     }
 
     @PostMapping("/crear")
-    public ApiResponse<Void> crear(@Valid @RequestBody TriajeCreateRequest c) {
-        service.crear(c);
-        return ApiResponse.Response("Creado Exitosamente");
+    public ApiResponse<TriajeCreateResponse> crear(@Valid @RequestBody TriajeCreateRequest c) {
+        Integer idTriaje = service.crear(c);
+        return ApiResponse.ResponseAn(new TriajeCreateResponse(idTriaje));
     }
 
     @PutMapping("/{id}")

@@ -6,6 +6,8 @@ import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoCatalogResp
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoCreateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoDeleteRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoDetailResponse;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoFilterRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.Turno.TurnoDTO.TurnoUpdateRequest;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
@@ -26,6 +28,17 @@ public class TurnoController {
     @GetMapping("/catalogo")
     public ApiResponse<List<TurnoCatalogResponse>> listar() {
         var data = service.catalogo(UsuarioActual.getAsociadoId());
+        return ApiResponse.ResponseList(data, data.size());
+    }
+
+    // Sin defaultValue en "estado" a propósito: a diferencia de los catálogos de referencia
+    // (Categoria, Mascota, etc.), esta tabla se administra con un toggle activar/desactivar
+    // inline (ver ProgramacionComponent), así que necesita ver activos e inactivos juntos.
+    @GetMapping
+    public ApiResponse<List<TurnoListResponse>> listarTodos(
+            @RequestParam(required = false) Boolean estado,
+            @RequestParam(required = false, defaultValue = "") String nombre) {
+        var data = service.listar(new TurnoFilterRequest(nombre, estado));
         return ApiResponse.ResponseList(data, data.size());
     }
 

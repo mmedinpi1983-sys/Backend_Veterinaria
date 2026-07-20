@@ -143,12 +143,12 @@ public class AtencionServiceImpl implements AtencionService {
     }
 
     @Override
-    public void crear(AtencionCreateRequest c) {
+    public Integer crear(AtencionCreateRequest c) {
         Atencion entity = m.toEntity(c);
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity.setFechaCreacion(LocalDateTime.now());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
-        r.save(entity);
+        return r.save(entity).getIdAtencion();
     }
 
     @Override

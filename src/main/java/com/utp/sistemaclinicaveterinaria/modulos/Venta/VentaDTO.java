@@ -13,6 +13,7 @@ public interface VentaDTO {
             Integer idProducto,
             String nombre,
             BigDecimal precioVenta,
+            Integer stock,
             String categoria) {
     }
 

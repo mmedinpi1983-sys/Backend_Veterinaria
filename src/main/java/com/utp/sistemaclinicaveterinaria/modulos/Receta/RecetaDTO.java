@@ -10,6 +10,7 @@ public interface RecetaDTO {
             String usuarioModificador, LocalDateTime fechaModificacion,
             String usuarioEliminador, LocalDateTime fechaEliminacion) {}
     record RecetaCreateRequest(Integer idConsulta, LocalDateTime fechaReceta, Integer idEmpleadoAsociado) {}
+    record RecetaCreateResponse(Integer idReceta) {}
     record RecetaUpdateRequest(Integer idConsulta, LocalDateTime fechaReceta, Integer idEmpleadoAsociado) {}
     record RecetaDeleteRequest(Integer idReceta) {}
 }

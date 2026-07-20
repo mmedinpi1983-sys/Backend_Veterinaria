@@ -11,6 +11,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.C
 import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.MotivoProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.MovimientoListarProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.MovimientoStatsProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.MovimientoProducto.Projection.StockActualProjection;
 
 public interface MovimientoProductoRepository extends JpaRepository<MovimientoProducto, Integer> {
 
@@ -61,8 +62,28 @@ public interface MovimientoProductoRepository extends JpaRepository<MovimientoPr
     @Query(value = "SELECT cantidadIngreso FROM Producto WHERE idProducto = :id", nativeQuery = true)
     Integer stockActual(@Param("id") Integer id);
 
+    // Version en lote de stockActual: una sola consulta para todos los productos de una venta,
+    // en vez de una consulta por cada linea de detalle.
+    @Query(value = "SELECT idProducto AS idProducto, cantidadIngreso AS stock FROM Producto WHERE idProducto IN (:ids)", nativeQuery = true)
+    List<StockActualProjection> stockActualEnLote(@Param("ids") List<Integer> ids);
+
     @Query(value = "SELECT descripcion FROM ClaseMovimiento WHERE idClaseMovimiento = :id", nativeQuery = true)
     String descripcionClase(@Param("id") Integer id);
+
+    // Ancladas al inicio del texto (no "contains") para no matchear otras filas por casualidad,
+    // p.ej. '%enta%' matcheaba tanto "Venta a cliente" como "Ajuste de inventario". El ORDER BY
+    // deja el TOP 1 determinista si en el futuro dos descripciones comparten el mismo prefijo.
+    @Query(value = "SELECT TOP 1 idClaseMovimiento FROM ClaseMovimiento WHERE descripcion LIKE 'Salida%' ORDER BY idClaseMovimiento", nativeQuery = true)
+    Integer idClaseSalida();
+
+    @Query(value = "SELECT TOP 1 idClaseMovimiento FROM ClaseMovimiento WHERE descripcion LIKE 'Entrada%' ORDER BY idClaseMovimiento", nativeQuery = true)
+    Integer idClaseEntrada();
+
+    @Query(value = "SELECT TOP 1 idMotivoMovimiento FROM MotivoMovimiento WHERE descripcion LIKE 'Venta%' ORDER BY idMotivoMovimiento", nativeQuery = true)
+    Integer idMotivoVenta();
+
+    @Query(value = "SELECT TOP 1 idMotivoMovimiento FROM MotivoMovimiento WHERE descripcion LIKE 'Devoluci%' ORDER BY idMotivoMovimiento", nativeQuery = true)
+    Integer idMotivoDevolucion();
 
     @Modifying
     @Query(value = """
