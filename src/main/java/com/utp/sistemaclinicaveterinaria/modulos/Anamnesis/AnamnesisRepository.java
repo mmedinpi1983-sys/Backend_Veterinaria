@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.Anamnesis;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -61,6 +63,8 @@ public interface AnamnesisRepository extends JpaRepository<Anamnesis, Integer> {
             """, nativeQuery = true)
     AnamnesisDetalleProjection detalle(@Param("idAnamnesis") Integer idAnamnesis);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Anamnesis
             SET

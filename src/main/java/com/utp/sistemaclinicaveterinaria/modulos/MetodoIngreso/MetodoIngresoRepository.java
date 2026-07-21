@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.MetodoIngreso;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -43,6 +45,8 @@ public interface MetodoIngresoRepository extends JpaRepository<MetodoIngreso, In
             """, nativeQuery = true)
     MetodoIngresoDetalleProjection detalle(@Param("idMetodoIngreso") Integer idMetodoIngreso, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE MetodoIngreso
             SET

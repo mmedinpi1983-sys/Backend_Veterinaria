@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.NivelSuscripcion;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -57,6 +59,8 @@ public interface NivelSuscripcionRepository extends JpaRepository<NivelSuscripci
             """, nativeQuery = true)
     NivelSuscripcionDetalleProjection detalle(@Param("idNivel") Integer idNivel);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE NivelSuscripcion
             SET

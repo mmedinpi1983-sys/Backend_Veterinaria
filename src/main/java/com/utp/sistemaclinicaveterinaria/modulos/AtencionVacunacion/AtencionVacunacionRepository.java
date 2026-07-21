@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.AtencionVacunacion;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -48,6 +50,8 @@ public interface AtencionVacunacionRepository extends JpaRepository<AtencionVacu
             """, nativeQuery = true)
     AtencionVacunacionDetalleProjection detalle(@Param("idVacunacion") Integer idVacunacion);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE AtencionVacunacion
             SET

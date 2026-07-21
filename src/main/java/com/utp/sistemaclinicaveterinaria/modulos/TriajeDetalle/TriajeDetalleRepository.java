@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.TriajeDetalle;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -55,6 +57,8 @@ public interface TriajeDetalleRepository extends JpaRepository<TriajeDetalle, In
             """, nativeQuery = true)
     TriajeDetalleDetalleProjection detalle(@Param("idTriajeDetalle") Integer idTriajeDetalle);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE TriajeDetalle
             SET

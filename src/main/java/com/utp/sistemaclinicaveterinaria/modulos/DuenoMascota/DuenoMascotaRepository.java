@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.DuenoMascota;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -52,6 +54,8 @@ public interface DuenoMascotaRepository extends JpaRepository<DuenoMascota, Inte
             """, nativeQuery = true)
     DuenoMascotaDetalleProjection detalle(@Param("idDuenoMascota") Integer idDuenoMascota, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Dueno_Mascota
             SET id_EmpleadoEliminador = :idUsuario, fechaEliminacion = GETDATE()

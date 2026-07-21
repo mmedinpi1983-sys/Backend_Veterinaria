@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.Presentacion;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -51,6 +53,8 @@ public interface PresentacionRepository extends JpaRepository<Presentacion, Inte
             """, nativeQuery = true)
     PresentacionDetalleProjection detalle(@Param("idPresentacion") Integer idPresentacion, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Presentacion
             SET

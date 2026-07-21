@@ -2,6 +2,8 @@ package com.utp.sistemaclinicaveterinaria.modulos.Receta;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -43,6 +45,8 @@ public interface RecetaRepository extends JpaRepository<Receta, Integer> {
             """, nativeQuery = true)
     RecetaDetalleProjection detalle(@Param("id") Integer id, @Param("idAsociado") Integer idAsociado);
 
+    @Modifying
+    @Transactional
     @Query(value = """
             UPDATE Receta
             SET fechaEliminacion = GETDATE(), id_EmpleadoEliminador = :idUsuario
