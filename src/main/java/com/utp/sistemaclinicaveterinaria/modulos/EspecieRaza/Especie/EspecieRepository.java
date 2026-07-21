@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.EspecieRaza;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieCatalogoProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieDetalleProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieListarProjection;
 
 import jakarta.transaction.Transactional;
 
@@ -25,7 +28,7 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         (id_Asociado IS NULL OR id_Asociado = :idAsociado)
                         ORDER BY nombre
                         """, nativeQuery = true)
-        List<Object[]> catalogo(@Param("idAsociado") Integer idAsociado);
+        List<EspecieCatalogoProjection> catalogo(@Param("idAsociado") Integer idAsociado);
 
         // lista para tabla
         @Query(value = """
@@ -37,12 +40,33 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         FROM EspecieRaza
                         WHERE
                         (:nombre IS NULL OR nombre LIKE CONCAT('%', :nombre, '%')) AND
-                        (:estado IS NULL OR estado = :estado) AND
-                        (id_Asociado IS NULL OR id_Asociado = :idAsociado);
+                        estado = :estado AND
+                        id_Especie IS NULL AND
+                        (id_Asociado IS NULL OR id_Asociado = :idAsociado)
+                        ORDER BY nombre
                         """, nativeQuery = true)
-        List<Object[]> listar(
+        List<EspecieListarProjection> listar(
                         @Param("nombre") String nombre,
                         @Param("estado") Boolean estado,
+                        @Param("idAsociado") Integer idAsociado);
+
+        // Mismo listado pero SIN filtrar por estado (para la opción "Todos").
+        // Se separa para no enlazar un Boolean nulo en la consulta nativa (SQL Server no infiere su tipo).
+        @Query(value = """
+                        SELECT
+                        idEspecieRaza,
+                        nombre,
+                        estado,
+                        fechaCreacion
+                        FROM EspecieRaza
+                        WHERE
+                        (:nombre IS NULL OR nombre LIKE CONCAT('%', :nombre, '%')) AND
+                        id_Especie IS NULL AND
+                        (id_Asociado IS NULL OR id_Asociado = :idAsociado)
+                        ORDER BY nombre
+                        """, nativeQuery = true)
+        List<EspecieListarProjection> listarTodos(
+                        @Param("nombre") String nombre,
                         @Param("idAsociado") Integer idAsociado);
 
         // Detalle
@@ -65,7 +89,7 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         (e.id_Asociado IS NULL OR e.id_Asociado = :idAsociado) AND
                         e.idEspecieRaza = :idEspecie
                         """, nativeQuery = true)
-        Object[] detalle(
+        EspecieDetalleProjection detalle(
                         @Param("idEspecie") Integer idEspecie,
                         @Param("idAsociado") Integer idAsociado);
 
@@ -78,7 +102,7 @@ public interface EspecieRepository extends JpaRepository<EspecieRaza, Integer> {
                         estado = 0,
                         id_EmpleadoEliminador = :idUsuario,
                         fechaEliminacion = GETDATE()
-                        WHERE idEspecieRaza = :idEspecie AND id_Asociado = :idAsociado
+                        WHERE idEspecieRaza = :idEspecie AND (id_Asociado IS NULL OR id_Asociado = :idAsociado)
                         """, nativeQuery = true)
         void eliminar(
                         @Param("idEspecie") Integer idEspecie,

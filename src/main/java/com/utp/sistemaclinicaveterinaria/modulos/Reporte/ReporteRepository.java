@@ -7,11 +7,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.CitaSemanaProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.CitaDetalleProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.DetalleProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.IngresoCategoriaProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.PacienteMesProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.ProductoTopProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.ResumenProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.ResumenRangoProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.Reporte.Projection.VeterinarioProductividadProjection;
 import com.utp.sistemaclinicaveterinaria.modulos.Venta.Venta;
 
 // Igual que en Dashboard: la entidad es solo un requisito de Spring Data, las consultas son nativas.
@@ -107,4 +110,81 @@ public interface ReporteRepository extends JpaRepository<Venta, Integer> {
             ORDER BY v.fechaVenta DESC
             """, nativeQuery = true)
     List<DetalleProjection> detalle(@Param("fi") String fi, @Param("ff") String ff);
+
+    // ===== KPIs del rango (para la hoja "Resumen" del Excel) =====
+    @Query(value = """
+            SELECT
+              (SELECT ISNULL(SUM(total),0) FROM Venta
+                 WHERE fechaEliminacion IS NULL AND ISNULL(estadoVenta,1)=1
+                   AND (:fi='' OR CAST(fechaVenta AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(fechaVenta AS DATE)<=CAST(:ff AS DATE))) AS ingresos,
+              (SELECT COUNT(*) FROM Venta
+                 WHERE fechaEliminacion IS NULL AND ISNULL(estadoVenta,1)=1
+                   AND (:fi='' OR CAST(fechaVenta AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(fechaVenta AS DATE)<=CAST(:ff AS DATE))) AS numVentas,
+              (SELECT COUNT(*) FROM CitaProgramada c JOIN EstadoCita ec ON c.id_EstadoCita=ec.idEstadoCita
+                 WHERE c.fechaEliminacion IS NULL AND ec.nombre='Completado'
+                   AND (:fi='' OR CAST(c.fecha AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(c.fecha AS DATE)<=CAST(:ff AS DATE))) AS citasAtendidas,
+              (SELECT COUNT(*) FROM CitaProgramada c JOIN EstadoCita ec ON c.id_EstadoCita=ec.idEstadoCita
+                 WHERE c.fechaEliminacion IS NULL AND ec.nombre='Cancelado'
+                   AND (:fi='' OR CAST(c.fecha AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(c.fecha AS DATE)<=CAST(:ff AS DATE))) AS citasCanceladas,
+              (SELECT ISNULL(SUM(vd.cantidad),0) FROM VentaDetalle vd JOIN Venta v ON vd.id_Venta=v.idVenta
+                 WHERE vd.fechaEliminacion IS NULL AND v.fechaEliminacion IS NULL AND ISNULL(v.estadoVenta,1)=1 AND vd.id_Producto IS NOT NULL
+                   AND (:fi='' OR CAST(v.fechaVenta AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(v.fechaVenta AS DATE)<=CAST(:ff AS DATE))) AS productosVendidos,
+              (SELECT COUNT(*) FROM Mascota
+                 WHERE fechaEliminacion IS NULL
+                   AND (:fi='' OR CAST(fechaCreacion AS DATE)>=CAST(:fi AS DATE))
+                   AND (:ff='' OR CAST(fechaCreacion AS DATE)<=CAST(:ff AS DATE))) AS pacientesNuevos
+            """, nativeQuery = true)
+    ResumenRangoProjection resumenRango(@Param("fi") String fi, @Param("ff") String ff);
+
+    // ===== Detalle de citas del rango (hoja "Citas") =====
+    @Query(value = """
+            SELECT
+              c.fecha AS fecha,
+              m.nombre AS mascota,
+              LTRIM(RTRIM(CONCAT(ISNULL(d.nombre,''),' ',ISNULL(d.apellidoPaterno,'')))) AS dueno,
+              esp.nombre AS especie,
+              raz.nombre AS raza,
+              s.nombre AS servicio,
+              LTRIM(RTRIM(CONCAT(ISNULL(ea.nombreEmpleado,''),' ',ISNULL(ea.apellidoPaterno,'')))) AS veterinario,
+              ec.nombre AS estado,
+              c.motivo AS motivo
+            FROM CitaProgramada c
+            LEFT JOIN Mascota m ON c.id_Mascota=m.idMascota
+            LEFT JOIN Dueno d ON c.id_Dueno=d.idDueno
+            LEFT JOIN EspecieRaza esp ON m.id_Especie=esp.idEspecieRaza
+            LEFT JOIN EspecieRaza raz ON m.id_Raza=raz.idEspecieRaza
+            LEFT JOIN Servicio s ON c.id_Servicio=s.idServicio
+            LEFT JOIN Programacion pr ON c.id_Programacion=pr.idProgramacion
+            LEFT JOIN EmpleadoAsociado ea ON pr.id_EmpleadoRegistrador=ea.idEmpleadoAsociado
+            LEFT JOIN EstadoCita ec ON c.id_EstadoCita=ec.idEstadoCita
+            WHERE c.fechaEliminacion IS NULL
+              AND (:fi='' OR CAST(c.fecha AS DATE)>=CAST(:fi AS DATE))
+              AND (:ff='' OR CAST(c.fecha AS DATE)<=CAST(:ff AS DATE))
+            ORDER BY c.fecha DESC
+            """, nativeQuery = true)
+    List<CitaDetalleProjection> detalleCitas(@Param("fi") String fi, @Param("ff") String ff);
+
+    // ===== Productividad por veterinario en el rango (hoja "Veterinarios") =====
+    @Query(value = """
+            SELECT
+              LTRIM(RTRIM(CONCAT(ISNULL(ea.nombreEmpleado,''),' ',ISNULL(ea.apellidoPaterno,'')))) AS veterinario,
+              SUM(CASE WHEN ec.nombre='Completado' THEN 1 ELSE 0 END) AS atendidas,
+              SUM(CASE WHEN ec.nombre='Cancelado'  THEN 1 ELSE 0 END) AS canceladas,
+              COUNT(*) AS totalCitas
+            FROM CitaProgramada c
+            LEFT JOIN Programacion pr ON c.id_Programacion=pr.idProgramacion
+            LEFT JOIN EmpleadoAsociado ea ON pr.id_EmpleadoRegistrador=ea.idEmpleadoAsociado
+            LEFT JOIN EstadoCita ec ON c.id_EstadoCita=ec.idEstadoCita
+            WHERE c.fechaEliminacion IS NULL
+              AND (:fi='' OR CAST(c.fecha AS DATE)>=CAST(:fi AS DATE))
+              AND (:ff='' OR CAST(c.fecha AS DATE)<=CAST(:ff AS DATE))
+            GROUP BY LTRIM(RTRIM(CONCAT(ISNULL(ea.nombreEmpleado,''),' ',ISNULL(ea.apellidoPaterno,''))))
+            ORDER BY atendidas DESC
+            """, nativeQuery = true)
+    List<VeterinarioProductividadProjection> productividadVeterinario(@Param("fi") String fi, @Param("ff") String ff);
 }

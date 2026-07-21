@@ -1,6 +1,5 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -13,47 +12,50 @@ import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.EspecieDTO.
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.EspecieDTO.EspecieDetailResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.EspecieDTO.EspecieListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.EspecieDTO.EspecieUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieCatalogoProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieDetalleProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Especie.Projection.EspecieListarProjection;
 
 @Mapper(componentModel = "spring")
 public interface EspecieMapper {
 
     // objeto de catalogo
-    default EspecieCatalogResponse EspecieCatalogMapper(Object[] e) {
+    default EspecieCatalogResponse EspecieCatalogMapper(EspecieCatalogoProjection e) {
         return new EspecieCatalogResponse(
-                (Integer) e[0],
-                (String) e[1]);
+                e.getIdEspecieRaza(),
+                e.getNombre());
     }
 
     // objeto que se mostrara en lista
-    default EspecieListResponse EspecieListMapper(Object[] e) {
+    default EspecieListResponse EspecieListMapper(EspecieListarProjection e) {
         return new EspecieListResponse(
-                (Integer) e[0],
-                (String) e[1],
-                (Boolean) e[2],
-                (LocalDateTime) e[3]);
+                e.getIdEspecieRaza(),
+                e.getNombre(),
+                e.getEstado(),
+                e.getFechaCreacion());
     }
 
     // Objecto completo que se mostrar
-    default EspecieDetailResponse EspecieDetailMapper(Object[] e) {
+    default EspecieDetailResponse EspecieDetailMapper(EspecieDetalleProjection e) {
         return new EspecieDetailResponse(
-                (Integer) e[0],
-                (String) e[1],
-                (Boolean) e[2],
-                (String) e[3],
-                (LocalDateTime) e[4],
-                (String) e[5],
-                (LocalDateTime) e[6],
-                (String) e[7],
-                (LocalDateTime) e[8]);
+                e.getIdEspecieRaza(),
+                e.getNombre(),
+                e.getEstado(),
+                e.getEmpleadoCreador(),
+                e.getFechaCreacion(),
+                e.getEmpleadoModificador(),
+                e.getFechaModificacion(),
+                e.getEmpleadoEliminador(),
+                e.getFechaEliminacion());
     }
 
     // catalogo lista
-    default List<EspecieCatalogResponse> catalogoMapper(List<Object[]> e) {
+    default List<EspecieCatalogResponse> catalogoMapper(List<EspecieCatalogoProjection> e) {
         return e.stream().map(this::EspecieCatalogMapper).toList();
     }
 
     // filas de tabla
-    default List<EspecieListResponse> listarMapper(List<Object[]> e) {
+    default List<EspecieListResponse> listarMapper(List<EspecieListarProjection> e) {
         return e.stream().map(this::EspecieListMapper).toList();
     }
 

@@ -32,7 +32,11 @@ public class EspecieServiceImpl implements EspecieService {
 
     @Override
     public List<EspecieListResponse> listar(EspecieFilterRequest f) {
-        return m.listarMapper(r.listar(f.nombre(), f.estado(), UsuarioActual.getAsociadoId()));
+        Integer idAsociado = UsuarioActual.getAsociadoId();
+        var rows = (f.estado() == null)
+                ? r.listarTodos(f.nombre(), idAsociado)
+                : r.listar(f.nombre(), f.estado(), idAsociado);
+        return m.listarMapper(rows);
     }
 
     @Override
@@ -43,6 +47,8 @@ public class EspecieServiceImpl implements EspecieService {
     @Override
     public void crear(EspecieCreateRequest c) {
         EspecieRaza entity = m.toEntity(c);
+        entity.setEstado(true);
+        entity.setFechaCreacion(LocalDateTime.now());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity = r.save(entity);

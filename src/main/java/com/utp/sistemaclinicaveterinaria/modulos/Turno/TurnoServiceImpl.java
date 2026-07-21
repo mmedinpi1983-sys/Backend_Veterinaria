@@ -30,7 +30,11 @@ public class TurnoServiceImpl implements TurnoService {
 
     @Override
     public List<TurnoListResponse> listar(TurnoFilterRequest f) {
-        return m.TurnoListMapperList(r.listar(f.nombre(), f.estado(), UsuarioActual.getAsociadoId()));
+        Integer idAsociado = UsuarioActual.getAsociadoId();
+        var rows = (f.estado() == null)
+                ? r.listarTodos(f.nombre(), idAsociado)
+                : r.listar(f.nombre(), f.estado(), idAsociado);
+        return m.TurnoListMapperList(rows);
     }
 
     @Override

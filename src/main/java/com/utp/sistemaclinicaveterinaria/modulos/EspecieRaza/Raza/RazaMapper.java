@@ -1,6 +1,5 @@
 package com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -13,50 +12,54 @@ import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.RazaDTO.RazaCr
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.RazaDTO.RazaDetailResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.RazaDTO.RazaListResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.RazaDTO.RazaUpdateRequest;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.Projection.RazaCatalogoProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.Projection.RazaDetalleProjection;
+import com.utp.sistemaclinicaveterinaria.modulos.EspecieRaza.Raza.Projection.RazaListarProjection;
 
 @Mapper(componentModel = "spring")
 public interface RazaMapper {
+
     // objeto del catalogo
-    default RazaCatalogResponse RazaCatalogMapper(Object[] r) {
+    default RazaCatalogResponse RazaCatalogMapper(RazaCatalogoProjection r) {
         return new RazaCatalogResponse(
-                (Integer) r[0],
-                (String) r[1],
-                (Integer) r[2]);
+                r.getIdEspecieRaza(),
+                r.getNombre(),
+                r.getIdEspecie());
     }
 
     // objeto que se mostrara en la lista
-    default RazaListResponse RazaListMapper(Object[] r) {
+    default RazaListResponse RazaListMapper(RazaListarProjection r) {
         return new RazaListResponse(
-                (Integer) r[0],
-                (String) r[1],
-                (String) r[2],
-                (Boolean) r[3],
-                (LocalDateTime) r[4]);
+                r.getIdEspecieRaza(),
+                r.getNombre(),
+                r.getNombreEspecie(),
+                r.getEstado(),
+                r.getFechaCreacion());
     }
 
     // objeto completo que se mostrara
-    default RazaDetailResponse RazaDetailMapper(Object[] row) {
+    default RazaDetailResponse RazaDetailMapper(RazaDetalleProjection r) {
         return new RazaDetailResponse(
-                (Integer) row[0], // idEspecieRaza
-                (String) row[1], // nombre
-                (Integer) row[2], // id_Especie
-                (String) row[3], // nombreEspecie
-                (Boolean) row[4], // estado — ojo, el índice 4
-                (String) row[5], // empleadoCreador
-                (LocalDateTime) row[6], // fechaCreacion
-                (String) row[7], // empleadoModificador
-                (LocalDateTime) row[8],
-                (String) row[9], // empleadoEliminador
-                (LocalDateTime) row[10]);
+                r.getIdEspecieRaza(),
+                r.getNombre(),
+                r.getIdEspecie(),
+                r.getNombreEspecie(),
+                r.getEstado(),
+                r.getEmpleadoCreador(),
+                r.getFechaCreacion(),
+                r.getEmpleadoModificador(),
+                r.getFechaModificacion(),
+                r.getEmpleadoEliminador(),
+                r.getFechaEliminacion());
     }
 
     // catalogo lista
-    default List<RazaCatalogResponse> catalogoMapper(List<Object[]> r) {
+    default List<RazaCatalogResponse> catalogoMapper(List<RazaCatalogoProjection> r) {
         return r.stream().map(this::RazaCatalogMapper).toList();
     }
 
     // filas de tabla
-    default List<RazaListResponse> listarMapper(List<Object[]> r) {
+    default List<RazaListResponse> listarMapper(List<RazaListarProjection> r) {
         return r.stream().map(this::RazaListMapper).toList();
     }
 

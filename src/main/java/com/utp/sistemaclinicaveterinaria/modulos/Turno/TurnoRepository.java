@@ -43,12 +43,31 @@ public interface TurnoRepository extends JpaRepository<Turno, Integer> {
                         FROM Turno
                         WHERE
                         (:nombre IS NULL OR nombre LIKE CONCAT('%', :nombre , '%')) AND
-                        (:estado IS NULL OR estado = :estado) AND
+                        estado = :estado AND
                         id_Asociado = :idAsociado
                         """, nativeQuery = true)
         List<TurnoListarProjection> listar(
                         @Param("nombre") String nombre,
                         @Param("estado") Boolean estado,
+                        @Param("idAsociado") Integer idAsociado);
+
+        // Mismo listado pero SIN filtrar por estado (para la opción "Todos").
+        // Se separa para no enlazar un Boolean nulo en la consulta nativa (SQL Server no infiere su tipo).
+        @Query(value = """
+                        SELECT
+                        idTurno,
+                        nombre,
+                        horaInicio,
+                        horaFin,
+                        fechaCreacion,
+                        estado
+                        FROM Turno
+                        WHERE
+                        (:nombre IS NULL OR nombre LIKE CONCAT('%', :nombre , '%')) AND
+                        id_Asociado = :idAsociado
+                        """, nativeQuery = true)
+        List<TurnoListarProjection> listarTodos(
+                        @Param("nombre") String nombre,
                         @Param("idAsociado") Integer idAsociado);
 
         // detalle de objeto

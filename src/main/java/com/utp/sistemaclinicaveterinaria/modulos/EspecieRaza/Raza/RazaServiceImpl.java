@@ -32,7 +32,11 @@ public class RazaServiceImpl implements RazaService {
 
     @Override
     public List<RazaListResponse> listar(RazaFilterRequest f) {
-        return m.listarMapper(r.listar(f.nombre(), f.estado(), f.idEspecie(), UsuarioActual.getAsociadoId()));
+        Integer idAsociado = UsuarioActual.getAsociadoId();
+        var rows = (f.estado() == null)
+                ? r.listarTodos(f.nombre(), idAsociado)
+                : r.listar(f.nombre(), f.estado(), idAsociado);
+        return m.listarMapper(rows);
     }
 
     @Override
@@ -43,6 +47,8 @@ public class RazaServiceImpl implements RazaService {
     @Override
     public void crear(RazaCreateRequest c) {
         EspecieRaza entity = m.toEntity(c);
+        entity.setEstado(true);
+        entity.setFechaCreacion(LocalDateTime.now());
         entity.setIdEmpleadoCreador(UsuarioActual.getId());
         entity.setIdAsociado(UsuarioActual.getAsociadoId());
         entity = r.save(entity);

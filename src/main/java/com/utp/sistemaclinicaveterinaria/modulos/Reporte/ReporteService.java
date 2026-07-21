@@ -8,4 +8,5 @@ import com.utp.sistemaclinicaveterinaria.modulos.Reporte.ReporteDTO.ReporteRespo
 public interface ReporteService {
     ReporteResponse obtener();
     List<DetalleResponse> detalle(String fechaInicio, String fechaFin);
+    byte[] generarExcel(List<String> tipos, String fechaInicio, String fechaFin);
 }
