@@ -106,4 +106,17 @@ public interface CitaProgramadaDTO {
         String horaInicio,
         String horaFin
     ) {}
+
+    // Programación "cruda" para el formulario de Nueva Cita: incluye fecha y servicio
+    // para que el front encadene los filtros (fecha + servicio -> veterinario -> hora).
+    record ProgramacionCita(
+        Integer idProgramacion,
+        LocalDate fecha,
+        Integer idServicio,
+        String nombreServicio,
+        String nombreVeterinario,
+        String nombreTurno,
+        String horaInicio,
+        String horaFin
+    ) {}
 }

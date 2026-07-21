@@ -49,6 +49,13 @@ public class Programacion {
     @Column(name = "id_Servicio", nullable = false)
     private Integer idServicio;
 
+    // Referencia viva al consultorio (catálogo). Nullable para compatibilidad con
+    // programaciones antiguas que solo tenían el texto libre en 'ambiente'.
+    @Column(name = "id_Consultorio")
+    private Integer idConsultorio;
+
+    // Snapshot histórico: se copia aquí el nombre del consultorio al crear/editar,
+    // para conservar cómo se llamaba en ese momento aunque luego cambie el catálogo.
     @Column(name = "ambiente", length = 255)
     private String ambiente;
 

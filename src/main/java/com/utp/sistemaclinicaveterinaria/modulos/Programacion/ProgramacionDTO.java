@@ -8,19 +8,20 @@ public interface ProgramacionDTO {
             String nombreVeterinario, String nombreTurno, String horaInicio, String horaFin,
             String nombreEstadoProgramacion,
             String ambiente, String descripcion, LocalDateTime fechaCreacion) {}
-    record ProgramacionFilterRequest(String fecha, Integer idEmpleadoRegistrador) {}
+    record ProgramacionFilterRequest(String fecha, Integer idEmpleadoRegistrador,
+            Integer idEstadoProgramacion, Integer idTurno) {}
     record ProgramacionDetailResponse(
             Integer idProgramacion, LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
             Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
-            String ambiente, String descripcion,
+            Integer idConsultorio, String ambiente, String descripcion,
             String usuarioCreador, LocalDateTime fechaCreacion,
             String usuarioModificador, LocalDateTime fechaModificacion,
             String usuarioEliminador, LocalDateTime fechaEliminacion) {}
     record ProgramacionCreateRequest(LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
             Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
-            String ambiente, String descripcion) {}
+            Integer idConsultorio, String ambiente, String descripcion) {}
     record ProgramacionUpdateRequest(LocalDate fecha, Integer idTurno, Integer idEmpleadoRegistrador,
             Integer idEstadoProgramacion, Integer idCategoria, Integer idServicio,
-            String ambiente, String descripcion) {}
+            Integer idConsultorio, String ambiente, String descripcion) {}
     record ProgramacionDeleteRequest(Integer idProgramacion) {}
 }

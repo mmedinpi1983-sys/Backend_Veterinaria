@@ -11,6 +11,7 @@ public interface ProgramacionDetalleProjection {
     Integer getIdEstadoProgramacion();
     Integer getIdCategoria();
     Integer getIdServicio();
+    Integer getIdConsultorio();
     String getAmbiente();
     String getDescripcion();
     String getEmpleadoCreador();

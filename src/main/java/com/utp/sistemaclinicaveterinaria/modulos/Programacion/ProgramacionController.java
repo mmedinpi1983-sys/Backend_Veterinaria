@@ -34,8 +34,10 @@ public class ProgramacionController {
     @GetMapping
     public ApiResponse<List<ProgramacionListResponse>> listar(
             @RequestParam(required = false, defaultValue = "") String fecha,
-            @RequestParam(required = false, defaultValue = "0") Integer idEmpleadoRegistrador) {
-        var data = service.listar(new ProgramacionFilterRequest(fecha, idEmpleadoRegistrador));
+            @RequestParam(required = false, defaultValue = "0") Integer idEmpleadoRegistrador,
+            @RequestParam(required = false, defaultValue = "0") Integer idEstadoProgramacion,
+            @RequestParam(required = false, defaultValue = "0") Integer idTurno) {
+        var data = service.listar(new ProgramacionFilterRequest(fecha, idEmpleadoRegistrador, idEstadoProgramacion, idTurno));
         return ApiResponse.ResponseList(data, data.size());
     }
 

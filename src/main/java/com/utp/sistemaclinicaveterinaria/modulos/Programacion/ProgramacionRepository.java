@@ -40,16 +40,20 @@ public interface ProgramacionRepository extends JpaRepository<Programacion, Inte
             WHERE p.fechaEliminacion IS NULL AND p.id_Asociado = :idAsociado
               AND (:fecha = '' OR CAST(p.fecha AS DATE) = CAST(:fecha AS DATE))
               AND (:idEmpleadoRegistrador = 0 OR p.id_EmpleadoRegistrador = :idEmpleadoRegistrador)
+              AND (:idEstadoProgramacion = 0 OR p.id_EstadoProgramacion = :idEstadoProgramacion)
+              AND (:idTurno = 0 OR p.id_Turno = :idTurno)
             ORDER BY p.fecha DESC, t.horaInicio
             """, nativeQuery = true)
     List<ProgramacionListarProjection> listar(@Param("idAsociado") Integer idAsociado,
                                                @Param("fecha") String fecha,
-                                               @Param("idEmpleadoRegistrador") Integer idEmpleadoRegistrador);
+                                               @Param("idEmpleadoRegistrador") Integer idEmpleadoRegistrador,
+                                               @Param("idEstadoProgramacion") Integer idEstadoProgramacion,
+                                               @Param("idTurno") Integer idTurno);
 
     @Query(value = """
             SELECT p.idProgramacion, p.fecha, p.id_Turno AS idTurno, p.id_EmpleadoRegistrador AS idEmpleadoRegistrador,
                    p.id_EstadoProgramacion AS idEstadoProgramacion, p.id_Categoria AS idCategoria,
-                   p.id_Servicio AS idServicio, p.ambiente, p.descripcion,
+                   p.id_Servicio AS idServicio, p.id_Consultorio AS idConsultorio, p.ambiente, p.descripcion,
                    CONCAT(TRIM(eac.apellidoPaterno),' ', TRIM(eac.apellidoMaterno), ' ', TRIM(eac.nombreEmpleado)) AS empleadoCreador,
                    p.fechaCreacion,
                    CONCAT(TRIM(eam.apellidoPaterno),' ', TRIM(eam.apellidoMaterno), ' ', TRIM(eam.nombreEmpleado)) AS empleadoModificador,

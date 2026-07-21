@@ -12,6 +12,15 @@ import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.Projection.CitaP
 
 public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, Integer> {
 
+    // Cuenta las citas activas (no eliminadas) asociadas a una programación.
+    // Se usa para impedir eliminar una programación que aún tiene citas.
+    @Query(value = """
+            SELECT COUNT(*)
+            FROM CitaProgramada
+            WHERE id_Programacion = :idProgramacion AND fechaEliminacion IS NULL
+            """, nativeQuery = true)
+    long contarPorProgramacion(@Param("idProgramacion") Integer idProgramacion);
+
     @Query(value = """
             SELECT
             cp.idCitaProgramada,
@@ -153,6 +162,31 @@ public interface CitaProgramadaRepository extends JpaRepository<CitaProgramada, 
         ORDER BY t.horaInicio
         """, nativeQuery = true)
     List<VeterinarioView> findVeterinariosDisponibles();
+
+    // Programaciones (una fila por programación, con fecha y servicio) para el form de Nueva Cita.
+    // Solo del asociado actual y de hoy en adelante (no tiene sentido agendar en el pasado).
+    @Query(value = """
+        SELECT
+            p.idProgramacion AS idProgramacion,
+            p.fecha AS fecha,
+            p.id_Servicio AS idServicio,
+            s.nombre AS nombreServicio,
+            ISNULL(ea.nombreEmpleado,'') + ' ' + ISNULL(ea.apellidoPaterno,'') AS nombreVeterinario,
+            t.nombre AS nombreTurno,
+            CONVERT(varchar(5), t.horaInicio, 108) AS horaInicio,
+            CONVERT(varchar(5), t.horaFin, 108) AS horaFin
+        FROM Programacion p
+        INNER JOIN EmpleadoAsociado ea ON p.id_EmpleadoRegistrador = ea.idEmpleadoAsociado
+        INNER JOIN Turno t ON p.id_Turno = t.idTurno
+        LEFT JOIN Servicio s ON p.id_Servicio = s.idServicio
+        WHERE p.fechaEliminacion IS NULL
+          AND ea.fechaEliminacion IS NULL
+          AND t.fechaEliminacion IS NULL
+          AND p.id_Asociado = :idAsociado
+          AND p.fecha >= CAST(GETDATE() AS DATE)
+        ORDER BY p.fecha, t.horaInicio
+        """, nativeQuery = true)
+    List<ProgramacionCitaView> findProgramacionesParaCita(@Param("idAsociado") Integer idAsociado);
 
     @Query(value = """
         SELECT CONVERT(varchar(5), c.horaInicio, 108)

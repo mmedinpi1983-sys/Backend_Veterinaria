@@ -40,6 +40,7 @@ public class PermisoAuthorizationFilter extends OncePerRequestFilter {
 
         MODULOS_GATEADOS.put("/api/programacion", "programacion");
         MODULOS_GATEADOS.put("/api/turno", "programacion");
+        MODULOS_GATEADOS.put("/api/consultorio", "programacion");
         MODULOS_GATEADOS.put("/api/estadoprogramacion", "programacion");
 
         MODULOS_GATEADOS.put("/api/atencionconsulta", "atencion clinica");

@@ -12,6 +12,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDT
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.CitaEnriquecida;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.StatsResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.VeterinarioDisponible;
+import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.ProgramacionCita;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiException;
 import com.utp.sistemaclinicaveterinaria.modulos.common.UsuarioActual;
 
@@ -114,6 +115,14 @@ public class CitaProgramadaServiceImpl implements CitaProgramadaService {
     public List<VeterinarioDisponible> listarVeterinarios() {
         return r.findVeterinariosDisponibles().stream().map(v -> new VeterinarioDisponible(
             v.getIdProgramacion(), v.getNombreVeterinario(), v.getNombreTurno(), v.getHoraInicio(), v.getHoraFin()
+        )).toList();
+    }
+
+    @Override
+    public List<ProgramacionCita> listarProgramacionesCita() {
+        return r.findProgramacionesParaCita(UsuarioActual.getAsociadoId()).stream().map(v -> new ProgramacionCita(
+            v.getIdProgramacion(), v.getFecha(), v.getIdServicio(), v.getNombreServicio(),
+            v.getNombreVeterinario(), v.getNombreTurno(), v.getHoraInicio(), v.getHoraFin()
         )).toList();
     }
 

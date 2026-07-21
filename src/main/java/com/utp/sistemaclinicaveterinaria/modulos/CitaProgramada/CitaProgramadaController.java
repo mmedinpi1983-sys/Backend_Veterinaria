@@ -11,6 +11,7 @@ import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDT
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.CitaEnriquecida;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.StatsResponse;
 import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.VeterinarioDisponible;
+import com.utp.sistemaclinicaveterinaria.modulos.CitaProgramada.CitaProgramadaDTO.ProgramacionCita;
 import com.utp.sistemaclinicaveterinaria.modulos.common.ApiResponse;
 
 import java.util.List;
@@ -45,6 +46,12 @@ public class CitaProgramadaController {
     @GetMapping("/stats")
     public ApiResponse<StatsResponse> getStats() {
         return ApiResponse.ResponseAn(service.getStats());
+    }
+
+    @GetMapping("/programaciones")
+    public ApiResponse<List<ProgramacionCita>> listarProgramacionesCita() {
+        var data = service.listarProgramacionesCita();
+        return ApiResponse.ResponseList(data, data.size());
     }
 
     @GetMapping("/veterinarios")

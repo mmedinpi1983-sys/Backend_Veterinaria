@@ -56,8 +56,10 @@ public interface DashboardRepository extends JpaRepository<Venta, Integer> {
             """, nativeQuery = true)
     List<CitaSemanaProjection> citasSemana();
 
+    // Solo los 5 productos mas criticos para el resumen del dashboard.
+    // El total real de alertas se muestra aparte (ResumenProjection.alertasStock).
     @Query(value = """
-            SELECT
+            SELECT TOP 5
               p.nombre          AS nombre,
               c.nombre          AS categoria,
               p.cantidadIngreso AS stock,
